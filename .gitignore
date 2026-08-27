@@ -8,3 +8,6 @@ _old_*/
 
 # not used by site (old slug text, 100M+)
 content/
+
+# full version backup (not deployed)
+index.full.html
