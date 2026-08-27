@@ -1,0 +1,10 @@
+# backup / temp
+*.bak
+*.bak.*
+*.lock
+_old_*/
+# local only
+.DS_Store
+
+# not used by site (old slug text, 100M+)
+content/

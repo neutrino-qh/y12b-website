@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Y12B Studio — Computational Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Instrument+Serif:ital@0;1&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#141413;          /* dark canvas */
+    --bg-soft:#1c1c1b;     /* lighter cell */
+    --bg-dim:#101010;      /* darker cell */
+    --dark:#0a0a09;        /* deepest section */
+    --ink:#f0f0ec;         /* primary text (light) */
+    --muted:#8a8a84;       /* secondary text */
+    --line:rgba(240,240,236,0.10);
+    --line-strong:rgba(240,240,236,0.30);
+    --white:#f4f4f0;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Inter',Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    font-size:15px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1440px;margin:0 auto;}
+
+  /* ============ GRID FRAME ============ */
+  .grid-bg{position:relative;}
+  .grid-bg::before{
+    content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+    background-image:repeating-linear-gradient(to right, var(--line) 0 1px, transparent 1px calc(100%/4));
+  }
+  .grid-bg > *{position:relative;z-index:1;}
+
+  /* ============ NAV ============ */
+  nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:start;padding:28px 48px 0;}
+  .nav-side{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink);text-decoration:none;padding-top:4px;}
+  .nav-side:last-child{text-align:right;justify-self:end;}
+  .nav-side:hover{opacity:.55;}
+  .nav-logo{text-align:center;line-height:1;}
+  .nav-logo a{
+    color:var(--ink);text-decoration:none;font-weight:700;font-size:22px;
+    font-family:'Inter',Helvetica,Arial,sans-serif;letter-spacing:.06em;display:block;
+  }
+  .nav-logo a:hover{opacity:.6;}
+  .nav-tagline{
+    margin-top:7px;
+    font-size:11px;
+    font-weight:300;
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    color:var(--muted);
+    line-height:1;
+  }
+
+  /* ============ PIXEL CURSOR FIELD ============ */
+#pixelfield{
+  position:fixed;inset:0;pointer-events:none;z-index:80;
+  display:none;
+}
+#pixelfield.on{display:block;}
+#pixelfield canvas{position:absolute;inset:0;width:100%;height:100%;}
+  #crosshair{
+    position:fixed;inset:0;pointer-events:none;z-index:90;display:none;
+  }
+  #crosshair .ch-v{
+    position:absolute;top:0;bottom:0;width:1px;
+    background:rgba(240,240,236,0.18);
+  }
+  #crosshair .ch-h{
+    position:absolute;left:0;right:0;height:1px;
+    background:rgba(240,240,236,0.18);
+  }
+  #crosshair .ch-plus{
+    position:absolute;width:10px;height:10px;transform:translate(-50%,-50%);
+    pointer-events:none;
+  }
+  #crosshair .ch-plus::before,
+  #crosshair .ch-plus::after{
+    content:'';position:absolute;background:rgba(240,240,236,0.6);
+    transition:background .15s ease, box-shadow .15s ease;
+  }
+  #crosshair .ch-plus::before{left:0;right:0;top:50%;height:1px;transform:translateY(-50%);}
+  #crosshair .ch-plus::after{top:0;bottom:0;left:50%;width:1px;transform:translateX(-50%);}
+  body.crosshair-hover #crosshair .ch-plus::before,
+  body.crosshair-hover #crosshair .ch-plus::after{
+    background:rgba(240,240,236,0.95);
+    box-shadow:0 0 0 0.5px rgba(240,240,236,0.45);
+  }
+  #crosshair .ch-coord{
+    position:absolute;transform:translate(14px,14px);
+    font-size:10px;letter-spacing:.12em;color:rgba(240,240,236,0.55);
+    background:rgba(20,20,19,0.6);padding:3px 8px;
+    font-variant-numeric:tabular-nums;white-space:nowrap;
+  }
+  body.crosshair-on, body.crosshair-on *{cursor:none;}
+
+  /* ============ HERO ============ */
+  .hero{text-align:center;padding:150px 24px 170px;}
+  .hero-kicker{
+    font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);
+    margin-bottom:36px;position:relative;display:inline-block;
+  }
+  .hero-kicker::before,.hero-kicker::after{
+    content:'';position:absolute;top:50%;width:120px;height:1px;background:var(--line-strong);
+  }
+  .hero-kicker::before{right:calc(100% + 24px);}
+  .hero-kicker::after{left:calc(100% + 24px);}
+  .hero-h1{font-size:clamp(48px,7.5vw,110px);line-height:1.02;font-weight:400;letter-spacing:-0.03em;}
+  .hero-h1 .it{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;}
+.hero-h1 .it{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;}
+
+  /* ============ PROJECT ROWS — 4 cells: 2 text + 2 image ============ */
+  .rows{border-top:1px solid var(--line-strong);}
+  .prow{
+    display:grid;grid-template-columns:repeat(4,1fr);
+    height:25vw;                          /* square unit row: 4 × 25vw */
+    border-bottom:1px solid var(--line);
+    position:relative;cursor:pointer;
+  }
+  .prow::after{
+    content:'';position:absolute;top:0;bottom:0;left:50%;width:1px;
+    background:var(--line-strong);pointer-events:none;z-index:4;
+  }
+  .prow::before{
+    content:'';position:absolute;top:0;bottom:0;left:75%;width:1px;
+    background:var(--line);pointer-events:none;z-index:4;
+  }
+  .prow.alt::before{left:25%;}
+  .prow .ph{
+    grid-column:span 2;                   /* image = 2 cells (50vw × 25vw) */
+    overflow:hidden;position:relative;padding:0;z-index:5;
+  }
+  .prow .ph img{
+    width:100%;height:100%;object-fit:cover;display:block;
+    filter:grayscale(1) contrast(1.04);
+    transition:filter .45s ease, transform .6s ease;
+  }
+  .prow:hover .ph img{filter:grayscale(0) contrast(1);transform:scale(1.03);}
+  .prow .ph .badge{
+    position:absolute;top:20px;left:24px;
+    font-size:10px;letter-spacing:.15em;text-transform:uppercase;
+    background:rgba(244,244,240,0.85);color:#141413;padding:4px 10px;
+  }
+  .prow .info{
+    grid-column:span 2;
+    position:relative;padding:24px 32px;
+    display:flex;flex-direction:column;justify-content:space-between;
+  }
+  .prow .info > *{position:relative;z-index:1;}
+  .prow .top{display:flex;justify-content:space-between;align-items:baseline;}
+  .prow .num{font-size:11px;color:var(--muted);letter-spacing:.1em;}
+  .prow .cat{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);}
+  .prow .title{
+    font-size:clamp(32px,3.6vw,56px);line-height:1.02;letter-spacing:-0.02em;font-weight:500;
+  }
+  .prow .title .it{
+    font-family:'Inter',Helvetica,Arial,sans-serif;
+    font-style:normal;font-weight:300;color:var(--muted);
+  }
+  .prow .sub{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:14px;}
+  /* alternate: photo right */
+  .prow.alt .ph{order:2;}
+  .prow.alt .info{order:1;}
+  /* tint variation on info cells */
+  .prow.tint .info{background:var(--bg-soft);}
+  .prow.tint-alt .info{background:var(--bg-dim);}
+
+  /* ============ WORK INDEX (dark list) ============ */
+  .index{background:var(--dark);color:var(--white);padding:110px 0 130px;}
+  .index-head{display:flex;justify-content:space-between;align-items:baseline;padding:0 48px;margin-bottom:56px;}
+  .index-title{font-size:clamp(40px,5vw,72px);letter-spacing:-0.02em;font-weight:400;}
+  .index-title .it{font-family:'Instrument Serif',Georgia,serif;font-style:italic;}
+  .index-note{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:rgba(244,244,240,.45);}
+  .index-list{border-top:1px solid rgba(244,244,240,.16);}
+  .index-row{
+    display:grid;grid-template-columns:70px 1fr auto;align-items:center;gap:24px;
+    padding:34px 48px;border-bottom:1px solid rgba(244,244,240,.16);
+    cursor:pointer;transition:background .25s;
+  }
+  .index-row:hover{background:rgba(244,244,240,.06);}
+  .index-row .no{font-size:11px;color:rgba(244,244,240,.4);letter-spacing:.1em;}
+  .index-row .name{
+    font-size:clamp(34px,4.4vw,64px);letter-spacing:-0.02em;font-weight:400;
+    color:rgba(244,244,240,.35);transition:color .25s;
+  }
+  .index-row:hover .name{color:var(--white);}
+  .index-row .meta{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(244,244,240,.4);text-align:right;}
+
+  /* ============ ABOUT ============ */
+  .about{padding:130px 48px;display:grid;grid-template-columns:1fr 1.2fr;gap:80px;}
+  .about-label{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:24px;}
+  .about-text{font-size:clamp(24px,2.6vw,38px);line-height:1.28;letter-spacing:-0.015em;font-weight:400;}
+  .about-text .it{font-family:'Instrument Serif',Georgia,serif;font-style:italic;}
+
+  /* ============ CONTACT ============ */
+  .contact{background:var(--dark);color:var(--white);padding:110px 48px 60px;}
+  .contact-label{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:rgba(244,244,240,.45);margin-bottom:28px;}
+  .contact-h2{font-size:clamp(44px,6vw,88px);line-height:1.02;letter-spacing:-0.02em;font-weight:400;margin-bottom:56px;}
+  .contact-h2 .it{font-family:'Instrument Serif',Georgia,serif;font-style:italic;}
+  .contact-rows{border-top:1px solid rgba(244,244,240,.16);}
+  .contact-row{
+    display:grid;grid-template-columns:200px 1fr;gap:24px;
+    padding:26px 0;border-bottom:1px solid rgba(244,244,240,.16);font-size:15px;
+  }
+  .contact-row .k{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(244,244,240,.45);padding-top:4px;}
+  .contact-row a{color:var(--white);text-decoration:none;}
+  .contact-row a:hover{opacity:.6;}
+  .contact-foot{
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;
+    margin-top:80px;padding-top:24px;border-top:1px solid rgba(244,244,240,.16);
+    font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(244,244,240,.4);
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width:960px){
+    .prow{grid-template-columns:1fr;height:auto;}
+    .prow .ph{grid-column:1;height:100vw;order:0 !important;}
+    .prow .info{grid-column:1;height:auto;min-height:60vw;order:1 !important;}
+    .about{grid-template-columns:1fr;gap:32px;padding:90px 28px;}
+    .index-head,.index-row{padding-left:28px;padding-right:28px;}
+    .index-row{grid-template-columns:44px 1fr;grid-auto-rows:auto;}
+    .index-row .meta{grid-column:2;text-align:left;margin-top:6px;}
+    nav{padding:22px 28px 0;}
+    .contact{padding:80px 28px 48px;}
+    .contact-row{grid-template-columns:1fr;gap:6px;}
+    .hero{padding:100px 20px 120px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg">
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-side" href="#work">Menu</a>
+    <div class="nav-logo">
+      <a href="#">Y12B</a>
+      <div class="nav-tagline">THINKING &amp; DOING ARCHITECTURE</div>
+    </div>
+    <a class="nav-side" href="#contact">Contacts</a>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+      <div class="hero-kicker">from hue, based in saigon</div>
+      <h1 class="hero-h1">Shaping <span class="it">your</span><br>future space</h1>
+  </header>
+
+  <!-- PROJECT ROWS: 1 project per row, square grid -->
+  <section class="rows" id="work">
+
+    <!-- 01 Bat Trang Pottery -->
+    <div class="prow" data-gallery="00-bat-trang" data-title="Bat Trang Pottery Showroom">
+      <div class="ph">
+        <img src="projects/00-bat-trang/cover.jpg" alt="Bat Trang Pottery Showroom">
+      </div>
+      <div class="info">
+        <div class="top">
+          <span class="num">01</span>
+          <span class="cat">Exhibition</span>
+        </div>
+        <div>
+          <div class="title">Bat Trang <span class="it">Pottery Showroom</span></div>
+          <div class="sub">2024 · Hà Nội</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02 Thi Thi -->
+    <div class="prow alt tint" data-gallery="01-thi-thi" data-title="Thi Thi Garden House">
+      <div class="ph">
+        <img src="projects/01-thi-thi/cover.jpg" alt="Thi Thi Garden House">
+      </div>
+      <div class="info">
+        <div class="top">
+          <span class="num">02</span>
+          <span class="cat">Residential</span>
+        </div>
+        <div>
+          <div class="title">Thi Thi <span class="it">Garden House</span></div>
+          <div class="sub">2025 · Tây Ninh</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03 Quoc Anh -->
+    <div class="prow" data-gallery="02-quoc-anh" data-title="Quoc Anh Beach Villa">
+      <div class="ph">
+        <img src="projects/02-quoc-anh/cover.jpg" alt="Quoc Anh Beach Villa">
+      </div>
+      <div class="info">
+        <div class="top">
+          <span class="num">03</span>
+          <span class="cat">Residential</span>
+        </div>
+        <div>
+          <div class="title">Quoc Anh <span class="it">Beach Villa</span></div>
+          <div class="sub">2026 · Huế</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 04 Phu Tho House -->
+    <div class="prow alt tint-alt" data-gallery="03-phu-tho" data-title="Phu Tho House">
+      <div class="ph">
+        <img src="projects/03-phu-tho/cover.jpg" alt="Phu Tho House">
+      </div>
+      <div class="info">
+        <div class="top">
+          <span class="num">04</span>
+          <span class="cat">Interior</span>
+        </div>
+        <div>
+          <div class="title">Phu Tho <span class="it">House</span></div>
+          <div class="sub">2023 · Phú Thọ</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 05 Hado -->
+    <div class="prow" data-gallery="04-hado" data-title="Hado Centrosa Apartment">
+      <div class="ph">
+        <img src="projects/04-hado/cover.jpg" alt="Hado Centrosa Apartment">
+      </div>
+      <div class="info">
+        <div class="top">
+          <span class="num">05</span>
+          <span class="cat">Interior</span>
+        </div>
+        <div>
+          <div class="title">Hado Centrosa <span class="it">Apartment</span></div>
+          <div class="sub">2024 · Sài Gòn</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 06 Mimosa -->
+    <div class="prow alt tint" data-gallery="05-mimosa" data-title="Mimosa Coffee House">
+      <div class="ph">
+        <img src="projects/05-mimosa/cover.jpg" alt="Mimosa Coffee House">
+      </div>
+      <div class="info">
+        <div class="top">
+          <span class="num">06</span>
+          <span class="cat">F & B</span>
+        </div>
+        <div>
+          <div class="title">Mimosa <span class="it">Coffee House</span></div>
+          <div class="sub">2024 · Đà Lạt</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- WORK INDEX (dark list) -->
+  <section class="index">
+    <div class="index-head">
+      <h2 class="index-title">Selected <span class="it">works</span></h2>
+      <span class="index-note">Index — 6 Projects</span>
+    </div>
+    <div class="index-list">
+      <div class="index-row" data-gallery="00-bat-trang" data-title="Bat Trang Pottery Showroom">
+        <span class="no">01</span>
+        <span class="name">Bat Trang Pottery Showroom</span>
+        <span class="meta">Showroom · Hà Nội</span>
+      </div>
+      <div class="index-row" data-gallery="02-quoc-anh" data-title="Quoc Anh Beach Villa">
+        <span class="no">02</span>
+        <span class="name">Quoc Anh Beach Villa</span>
+        <span class="meta">Garden House · 2026</span>
+      </div>
+      <div class="index-row" data-gallery="01-thi-thi" data-title="Thi Thi Garden House">
+        <span class="no">03</span>
+        <span class="name">Thi Thi Garden House</span>
+        <span class="meta">Renovation · 2025</span>
+      </div>
+      <div class="index-row" data-gallery="03-phu-tho" data-title="Phu Tho House">
+        <span class="no">04</span>
+        <span class="name">Phu Tho House</span>
+        <span class="meta">Residential · Phú Thọ</span>
+      </div>
+      <div class="index-row" data-gallery="04-hado" data-title="Hado Centrosa Apartment">
+        <span class="no">05</span>
+        <span class="name">Hado Centrosa Apartment</span>
+        <span class="meta">Apartment · 2024</span>
+      </div>
+      <div class="index-row" data-gallery="05-mimosa" data-title="Mimosa Coffee House">
+        <span class="no">06</span>
+        <span class="name">Mimosa Coffee House</span>
+        <span class="meta">Café · Lâm Đồng · 2023–24</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about">
+    <div>
+      <div class="about-label">Core Philosophy</div>
+    </div>
+    <div class="about-text">
+      We shape contemporary spaces while <span class="it">listening</span> to vernacular materials and traditions.
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact" id="contact">
+    <div class="contact-label">Contacts</div>
+    <h2 class="contact-h2">Let's shape<br>your <span class="it">space.</span></h2>
+    <div class="contact-rows">
+      <div class="contact-row">
+        <span class="k">Email</span>
+        <span><a href="mailto:y12barchitects@gmail.com">y12barchitects@gmail.com</a></span>
+      </div>
+      <div class="contact-row">
+        <span class="k">Phone</span>
+        <span><a href="tel:+84935386601">(+84) 935 386 601</a> &nbsp;·&nbsp; <a href="tel:+84903772013">(+84) 903 772 013</a></span>
+      </div>
+      <div class="contact-row">
+        <span class="k">Studio</span>
+        <span>18 Pho Duc Chinh street, Gia Dinh ward, Ho Chi Minh City</span>
+      </div>
+    </div>
+    <div class="contact-foot">
+      <span>Y12B Studio — THINKING &amp; DOING ARCHITECTURE</span>
+      <span>© 2026 · Ho Chi Minh City</span>
+    </div>
+  </section>
+
+</div>
+
+<!-- CROSSHAIR -->
+<div id="crosshair">
+  <div class="ch-v" id="chV"></div>
+  <div class="ch-h" id="chH"></div>
+  <div class="ch-plus" id="chPlus"></div>
+  <div class="ch-coord" id="chCoord">X:0000 Y:0000</div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" style="display:none;position:fixed;inset:0;z-index:100;background:rgba(20,20,18,0.95);align-items:center;justify-content:center;flex-direction:column;overflow:hidden;">
+  <button id="lbClose" style="position:absolute;top:24px;right:32px;background:none;border:none;color:#f4f4f0;font-size:30px;cursor:pointer;z-index:5;">×</button>
+  <button id="lbPrev" style="position:absolute;top:50%;left:32px;transform:translateY(-50%);background:none;border:none;color:#f4f4f0;font-size:36px;cursor:pointer;z-index:5;">‹</button>
+  <button id="lbNext" style="position:absolute;top:50%;right:32px;transform:translateY(-50%);background:none;border:none;color:#f4f4f0;font-size:36px;cursor:pointer;z-index:5;">›</button>
+  <div id="lbStage" style="position:relative;width:82vw;height:76vh;perspective:1400px;">
+    <img id="lbImgA" src="" alt="" class="lb-slide" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;">
+    <img id="lbImgB" src="" alt="" class="lb-slide" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;">
+  </div>
+  <div id="lbCaption" style="color:rgba(244,244,240,.6);font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin-top:16px;"></div>
+  <div id="lbDots" style="display:flex;gap:8px;margin-top:14px;"></div>
+</div>
+
+<style>
+  .lb-slide{opacity:0;transform:translateX(12%) scale(.96);transition:opacity .55s cubic-bezier(.22,.61,.36,1), transform .65s cubic-bezier(.22,.61,.36,1);will-change:transform,opacity;}
+  .lb-slide.active{opacity:1;transform:translateX(0) scale(1);}
+  .lb-slide.exit-left{opacity:0;transform:translateX(-14%) scale(.92);}
+  .lb-slide.exit-right{opacity:0;transform:translateX(14%) scale(.92);}
+  #lbDots .dot{width:22px;height:3px;background:rgba(244,244,240,.25);cursor:pointer;transition:background .3s;border:none;padding:0;}
+  #lbDots .dot.on{background:#f4f4f0;}
+</style>
+
+<script>
+/* ---- CROSSHAIR ---- */
+(function(){
+  const ch = document.getElementById('crosshair');
+  const v = document.getElementById('chV');
+  const h = document.getElementById('chH');
+  const plus = document.getElementById('chPlus');
+  const coord = document.getElementById('chCoord');
+  let raf = null;
+  const clickable = 'a,button,[data-gallery],.index-row,.prow,.dot,input,textarea';
+  document.addEventListener('mousemove', e => {
+    if (raf) return;
+    raf = requestAnimationFrame(() => {
+      ch.style.display = 'block';
+      document.body.classList.add('crosshair-on');
+      v.style.left = e.clientX + 'px';
+      h.style.top = e.clientY + 'px';
+      plus.style.left = e.clientX + 'px';
+      plus.style.top = e.clientY + 'px';
+      const hit = !!(e.target.closest && e.target.closest(clickable));
+      document.body.classList.toggle('crosshair-hover', hit);
+      const px = String(e.clientX).padStart(4, '0');
+      const py = String(e.clientY).padStart(4, '0');
+      coord.textContent = 'X:' + px + ' Y:' + py;
+      coord.style.left = e.clientX + 'px';
+      coord.style.top = e.clientY + 'px';
+      raf = null;
+    });
+  });
+  document.addEventListener('mouseleave', () => {
+    ch.style.display = 'none';
+    document.body.classList.remove('crosshair-on');
+  });
+})();
+
+/* ---- PIXEL BLUR FIELD (around cursor over hero text) -- REMOVED -- */
+
+const GALLERIES = {"00-bat-trang": ["projects/00-bat-trang/gallery/01.jpg","projects/00-bat-trang/gallery/02.jpg","projects/00-bat-trang/gallery/03.jpg","projects/00-bat-trang/gallery/04.jpg","projects/00-bat-trang/gallery/05.jpg","projects/00-bat-trang/gallery/06.jpg","projects/00-bat-trang/gallery/07.jpg","projects/00-bat-trang/gallery/08.jpg","projects/00-bat-trang/gallery/09.jpg","projects/00-bat-trang/gallery/10.jpg"], "01-thi-thi": ["projects/01-thi-thi/gallery/01.jpg","projects/01-thi-thi/gallery/02.jpg","projects/01-thi-thi/gallery/03.jpg","projects/01-thi-thi/gallery/04.jpg","projects/01-thi-thi/gallery/05.jpg","projects/01-thi-thi/gallery/06.jpg","projects/01-thi-thi/gallery/07.jpg","projects/01-thi-thi/gallery/08.jpg","projects/01-thi-thi/gallery/09.jpg","projects/01-thi-thi/gallery/10.jpg","projects/01-thi-thi/gallery/11.jpg","projects/01-thi-thi/gallery/12.jpg"], "02-quoc-anh": ["projects/02-quoc-anh/gallery/01.jpg","projects/02-quoc-anh/gallery/02.jpg","projects/02-quoc-anh/gallery/03.jpg","projects/02-quoc-anh/gallery/04.jpg","projects/02-quoc-anh/gallery/05.jpg"], "03-phu-tho": ["projects/03-phu-tho/gallery/01.jpg","projects/03-phu-tho/gallery/02.jpg","projects/03-phu-tho/gallery/03.jpg","projects/03-phu-tho/gallery/04.jpg","projects/03-phu-tho/gallery/05.jpg"], "04-hado": ["projects/04-hado/gallery/01.jpg","projects/04-hado/gallery/02.jpg","projects/04-hado/gallery/03.jpg"], "05-mimosa": ["projects/05-mimosa/gallery/01.jpg","projects/05-mimosa/gallery/02.jpg","projects/05-mimosa/gallery/03.jpg","projects/05-mimosa/gallery/04.jpg","projects/05-mimosa/gallery/05.jpg","projects/05-mimosa/gallery/06.jpg","projects/05-mimosa/gallery/07.jpg"]};
+const lb = document.getElementById('lightbox');
+const stage = document.getElementById('lbStage');
+const imgA = document.getElementById('lbImgA');
+const imgB = document.getElementById('lbImgB');
+const lbCap = document.getElementById('lbCaption');
+const lbDots = document.getElementById('lbDots');
+const slides = [imgA, imgB];
+let curList = [], curIdx = 0, curTitle = '', front = 0, busy = false;
+
+function preload(list){ list.forEach(u => { const i = new Image(); i.src = u; }); }
+
+function renderDots(){
+  lbDots.innerHTML = '';
+  curList.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'dot' + (i === curIdx ? ' on' : '');
+    d.onclick = e => { e.stopPropagation(); if (i !== curIdx) go(i, i > curIdx ? 1 : -1); };
+    lbDots.appendChild(d);
+  });
+}
+
+function setCaption(){
+  lbCap.textContent = curTitle + ' — ' + (curIdx + 1) + ' / ' + curList.length;
+  [...lbDots.children].forEach((d, i) => d.classList.toggle('on', i === curIdx));
+}
+
+function openAt(idx){
+  front = 0;
+  slides[0].src = curList[idx];
+  slides[0].className = 'lb-slide active';
+  slides[1].className = 'lb-slide';
+  slides[1].src = '';
+  curIdx = idx;
+  setCaption();
+}
+
+function go(newIdx, dir){
+  if (busy || !curList.length) return;
+  busy = true;
+  const oldEl = slides[front];
+  const newEl = slides[1 - front];
+  newEl.src = curList[newIdx];
+  // place incoming on the correct side
+  newEl.style.transition = 'none';
+  newEl.className = 'lb-slide';
+  newEl.style.transform = dir > 0 ? 'translateX(60%) scale(.9)' : 'translateX(-60%) scale(.9)';
+  newEl.style.opacity = '0';
+  void newEl.offsetWidth;   // force reflow
+  newEl.style.transition = '';
+  // clear inline overrides so the .active class can take effect (FIX: image vanished on next slide)
+  newEl.style.transform = '';
+  newEl.style.opacity = '';
+  // animate
+  oldEl.className = 'lb-slide ' + (dir > 0 ? 'exit-left' : 'exit-right');
+  newEl.className = 'lb-slide active';
+  front = 1 - front;
+  curIdx = newIdx;
+  setCaption();
+  setTimeout(() => { busy = false; }, 620);
+}
+
+document.querySelectorAll('.index-row[data-gallery], .prow[data-gallery]').forEach(el => {
+  el.addEventListener('click', () => {
+    const slug = el.dataset.gallery;
+    if (!GALLERIES[slug]) return;
+    curList = GALLERIES[slug];
+    curTitle = el.dataset.title || '';
+    preload(curList);
+    renderDots();
+    openAt(0);
+    lb.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  });
+});
+function closeLb(){ lb.style.display = 'none'; document.body.style.overflow = ''; }
+document.getElementById('lbClose').onclick = closeLb;
+document.getElementById('lbPrev').onclick = e => { e.stopPropagation(); go((curIdx - 1 + curList.length) % curList.length, -1); };
+document.getElementById('lbNext').onclick = e => { e.stopPropagation(); go((curIdx + 1) % curList.length, 1); };
+lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
+document.addEventListener('keydown', e => {
+  if (lb.style.display !== 'flex') return;
+  if (e.key === 'Escape') closeLb();
+  if (e.key === 'ArrowLeft') go((curIdx - 1 + curList.length) % curList.length, -1);
+  if (e.key === 'ArrowRight') go((curIdx + 1) % curList.length, 1);
+});
+// swipe on touch devices
+let touchX = null;
+lb.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, {passive: true});
+lb.addEventListener('touchend', e => {
+  if (touchX === null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (Math.abs(dx) > 50) (dx < 0) ? go((curIdx + 1) % curList.length, 1) : go((curIdx - 1 + curList.length) % curList.length, -1);
+  touchX = null;
+}, {passive: true});
+</script>
+
+</body>
+</html>
