@@ -55,10 +55,9 @@
   .menu-btn:hover{opacity:.55;}
   .menu-drop{
     position:absolute;top:100%;left:0;right:0;width:100%;
-    background:var(--bg);
+    background:var(--bg);border-top:1px solid var(--line);
     display:none;grid-template-columns:repeat(4,1fr);
-    gap:0;z-index:200;
-    border-top:1px solid var(--line);
+    gap:0;z-index:400;
   }
   .menu-drop.open{display:grid;}
   .menu-group{padding:32px 48px;border-right:1px solid var(--line);}
@@ -69,9 +68,9 @@
   }
   .menu-drop a{
     display:inline-block;color:var(--muted);text-decoration:none;font-size:12px;letter-spacing:.04em;text-transform:uppercase;
-    padding:6px 2px;margin:2px 0;white-space:nowrap;font-weight:400;transition:color .15s ease, font-weight .15s ease;cursor:pointer;
+    padding:6px 2px;margin:2px 0;white-space:nowrap;font-weight:400;transition:color .15s ease, font-weight .15s ease;cursor:pointer;position:relative;z-index:2;
   }
-  .menu-drop a:hover{opacity:1;color:var(--ink) !important;font-weight:700 !important;}
+  .menu-drop a:hover, .menu-drop a:focus{opacity:1;color:var(--ink) !important;font-weight:700 !important;outline:none;}
   .nav-logo{text-align:center;line-height:1;}
   .nav-logo a{
     color:var(--ink);text-decoration:none;font-weight:700;font-size:22px;
@@ -669,24 +668,12 @@ function toggleMenu(e){
   var open = menuDrop.classList.toggle('open');
   menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
 }
-function goToProject(link){
-  var slug = link.getAttribute('href').replace('#','');
-  var target = document.getElementById(slug);
-  if (target) {
-    var y = target.getBoundingClientRect().top + window.pageYOffset - 80;
-    window.scrollTo({ top: y, behavior: 'smooth' });
-  }
-  setTimeout(closeMenu, 450);
-  return false;
-}
 if (menuBtn) menuBtn.addEventListener('click', toggleMenu);
+// Native anchor (href="#slug") handles the smooth scroll; we just close the menu after.
 if (menuDrop) {
   var menuLinks = menuDrop.getElementsByTagName('a');
   for (var i = 0; i < menuLinks.length; i++) {
-    menuLinks[i].onclick = function(e){
-      if (e && e.preventDefault) e.preventDefault();
-      return goToProject(this);
-    };
+    menuLinks[i].onclick = function(){ setTimeout(closeMenu, 10); };
   }
 }
 document.addEventListener('click', function(e){
