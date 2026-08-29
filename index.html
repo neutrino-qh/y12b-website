@@ -507,8 +507,8 @@
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" style="display:none;position:fixed;inset:0;z-index:100;background:rgba(20,20,18,0.95);align-items:center;justify-content:center;flex-direction:column;overflow:hidden;">
   <button id="lbClose" style="position:absolute;top:24px;right:32px;background:none;border:none;color:#f4f4f0;font-size:30px;cursor:pointer;z-index:5;">×</button>
-  <button id="lbPrev" style="position:absolute;top:50%;left:32px;transform:translateY(-50%);background:none;border:none;color:#f4f4f0;font-size:36px;cursor:pointer;z-index:5;">‹</button>
-  <button id="lbNext" style="position:absolute;top:50%;right:32px;transform:translateY(-50%);background:none;border:none;color:#f4f4f0;font-size:36px;cursor:pointer;z-index:5;">›</button>
+  <button id="lbPrev" class="lb-nav-btn lb-prev" style="position:absolute;top:50%;left:32px;transform:translateY(-50%);">‹</button>
+  <button id="lbNext" class="lb-nav-btn lb-next" style="position:absolute;top:50%;right:32px;transform:translateY(-50%);">›</button>
   <div id="lbStage" style="position:relative;width:82vw;height:76vh;perspective:1400px;">
     <img id="lbImgA" src="" alt="" class="lb-slide" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;">
     <img id="lbImgB" src="" alt="" class="lb-slide" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;">
@@ -529,6 +529,18 @@
   }
   #lbDots .dot{width:22px;height:3px;background:rgba(244,244,240,.25);cursor:pointer;transition:background .3s;border:none;padding:0;}
   #lbDots .dot.on{background:#f4f4f0;}
+  /* gallery prev/next: larger hit area + grow on hover */
+  .lb-nav-btn{
+    background:none;border:none;color:#f4f4f0;cursor:pointer;z-index:5;
+    font-size:36px;line-height:1;
+    padding:28px 44px;            /* wide clickable zone around the arrow */
+    transition:font-size .18s ease, color .18s ease, background .18s ease;
+  }
+  .lb-nav-btn:hover{
+    font-size:52px;               /* grow when hovered */
+    color:#ffffff;
+    background:rgba(244,244,240,.06);
+  }
 </style>
 
 <script>
