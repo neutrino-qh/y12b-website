@@ -95,7 +95,7 @@
 #pixelfield.on{display:block;}
 #pixelfield canvas{position:absolute;inset:0;width:100%;height:100%;}
   #crosshair{
-    position:fixed;inset:0;pointer-events:none;z-index:90;display:none;
+    position:fixed;inset:0;pointer-events:none !important;z-index:90;display:none;
   }
   #crosshair .ch-v{
     position:absolute;top:0;bottom:0;width:1px;
@@ -536,6 +536,14 @@
   document.addEventListener('mousemove', e => {
     if (raf) return;
     raf = requestAnimationFrame(() => {
+      // hide crosshair while the menu dropdown is open so it never overlays menu links
+      var menuOpen = document.getElementById('menuDrop') && document.getElementById('menuDrop').classList.contains('open');
+      if (menuOpen) {
+        ch.style.display = 'none';
+        document.body.classList.remove('crosshair-on');
+        raf = null;
+        return;
+      }
       ch.style.display = 'block';
       document.body.classList.add('crosshair-on');
       v.style.left = e.clientX + 'px';
