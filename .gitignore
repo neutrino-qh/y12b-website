@@ -11,3 +11,4 @@ content/
 
 # full version backup (not deployed)
 index.full.html
+node_modules/
