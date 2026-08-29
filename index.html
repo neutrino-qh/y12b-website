@@ -506,7 +506,7 @@
 
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" style="display:none;position:fixed;inset:0;z-index:100;background:rgba(20,20,18,0.95);align-items:center;justify-content:center;flex-direction:column;overflow:hidden;">
-  <button id="lbClose" style="position:absolute;top:12vh;right:49px;width:36px;height:36px;background:none;border:none;cursor:pointer;z-index:6;background-image:url(&quot;data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='48'%20height='48'%20viewBox='0%200%2048%2048'%3E%3Cpath%20fill='white'%20d='M24%2016%20L0%20-8%20L48%20-8%20Z%20M24%2032%20L0%2056%20L48%2056%20Z%20M16%2024%20L-8%200%20L-8%2048%20Z%20M32%2024%20L56%200%20L56%2048%20Z'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:center;"></button>
+  <button id="lbClose" style="position:absolute;right:49px;width:36px;height:36px;background:none;border:none;cursor:pointer;z-index:6;background-image:url(&quot;data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='48'%20height='48'%20viewBox='0%200%2048%2048'%3E%3Cpath%20fill='white'%20d='M24%2016%20L0%20-8%20L48%20-8%20Z%20M24%2032%20L0%2056%20L48%2056%20Z%20M16%2024%20L-8%200%20L-8%2048%20Z%20M32%2024%20L56%200%20L56%2048%20Z'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:center;"></button>
   <button id="lbPrev" class="lb-nav-btn lb-prev" style="position:absolute;top:50%;left:32px;transform:translateY(-50%);" aria-label="Previous"></button>
   <button id="lbNext" class="lb-nav-btn lb-next" style="position:absolute;top:50%;right:32px;transform:translateY(-50%);" aria-label="Next"></button>
   <div id="lbStage" style="position:relative;width:82vw;height:76vh;perspective:1400px;">
@@ -602,6 +602,7 @@
 const GALLERIES = {"00-bat-trang": ["projects/00-bat-trang/gallery/01.jpg","projects/00-bat-trang/gallery/02.jpg","projects/00-bat-trang/gallery/03.jpg","projects/00-bat-trang/gallery/04.jpg","projects/00-bat-trang/gallery/05.jpg","projects/00-bat-trang/gallery/06.jpg","projects/00-bat-trang/gallery/07.jpg","projects/00-bat-trang/gallery/08.jpg","projects/00-bat-trang/gallery/09.jpg","projects/00-bat-trang/gallery/10.jpg"], "01-thi-thi": ["projects/01-thi-thi/gallery/01.jpg","projects/01-thi-thi/gallery/02.jpg","projects/01-thi-thi/gallery/03.jpg","projects/01-thi-thi/gallery/04.jpg","projects/01-thi-thi/gallery/05.jpg","projects/01-thi-thi/gallery/06.jpg","projects/01-thi-thi/gallery/07.jpg","projects/01-thi-thi/gallery/08.jpg","projects/01-thi-thi/gallery/09.jpg","projects/01-thi-thi/gallery/10.jpg","projects/01-thi-thi/gallery/11.jpg","projects/01-thi-thi/gallery/12.jpg"], "02-quoc-anh": ["projects/02-quoc-anh/gallery/01.jpg","projects/02-quoc-anh/gallery/02.jpg","projects/02-quoc-anh/gallery/03.jpg","projects/02-quoc-anh/gallery/04.jpg","projects/02-quoc-anh/gallery/05.jpg"], "03-phu-tho": ["projects/03-phu-tho/gallery/01.jpg","projects/03-phu-tho/gallery/02.jpg","projects/03-phu-tho/gallery/03.jpg","projects/03-phu-tho/gallery/04.jpg","projects/03-phu-tho/gallery/05.jpg"], "04-hado": ["projects/04-hado/gallery/01.jpg","projects/04-hado/gallery/02.jpg","projects/04-hado/gallery/03.jpg"], "05-mimosa": ["projects/05-mimosa/gallery/01.jpg","projects/05-mimosa/gallery/02.jpg","projects/05-mimosa/gallery/03.jpg","projects/05-mimosa/gallery/04.jpg","projects/05-mimosa/gallery/05.jpg","projects/05-mimosa/gallery/06.jpg","projects/05-mimosa/gallery/07.jpg"]};
 const lb = document.getElementById('lightbox');
 const stage = document.getElementById('lbStage');
+const xBtn = document.getElementById('lbClose');
 const imgA = document.getElementById('lbImgA');
 const imgB = document.getElementById('lbImgB');
 const lbCap = document.getElementById('lbCaption');
@@ -671,6 +672,7 @@ document.querySelectorAll('.index-row[data-gallery], .prow[data-gallery]').forEa
     renderDots();
     openAt(0);
     lb.style.display = 'flex';
+    xBtn.style.top = stage.getBoundingClientRect().top + 'px';
     document.body.classList.add('lb-open');
     document.body.style.overflow = 'hidden';
   });
