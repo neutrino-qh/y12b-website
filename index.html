@@ -64,7 +64,7 @@
   .menu-group{padding:32px 48px;border-right:1px solid var(--line);}
   .menu-group:last-child{border-right:none;}
   .menu-cat{
-    font-size:26px;letter-spacing:.01em;text-transform:none;color:var(--ink);font-weight:500;
+    font-size:18px;letter-spacing:.01em;text-transform:none;color:var(--ink);font-weight:500;
     margin-bottom:16px;line-height:1.05;
   }
   .menu-drop a{
@@ -280,21 +280,21 @@
       <div class="menu-drop" id="menuDrop">
         <div class="menu-group">
           <div class="menu-cat">Residential</div>
-          <a href="#work" data-goto="01-thi-thi">Thi Thi Garden House</a>
-          <a href="#work" data-goto="02-quoc-anh">Quoc Anh Beach Villa</a>
-          <a href="#work" data-goto="03-phu-tho">Phu Tho House</a>
+          <a href="#01-thi-thi">Thi Thi Garden House</a>
+          <a href="#02-quoc-anh">Quoc Anh Beach Villa</a>
+          <a href="#03-phu-tho">Phu Tho House</a>
         </div>
         <div class="menu-group">
           <div class="menu-cat">Exhibition</div>
-          <a href="#work" data-goto="00-bat-trang">Bat Trang Pottery Showroom</a>
+          <a href="#00-bat-trang">Bat Trang Pottery Showroom</a>
         </div>
         <div class="menu-group">
           <div class="menu-cat">Interior</div>
-          <a href="#work" data-goto="04-hado">Hado Centrosa Apartment</a>
+          <a href="#04-hado">Hado Centrosa Apartment</a>
         </div>
         <div class="menu-group">
           <div class="menu-cat">F &amp; B</div>
-          <a href="#work" data-goto="05-mimosa">Mimosa Coffee House</a>
+          <a href="#05-mimosa">Mimosa Coffee House</a>
         </div>
       </div>
     </div>
@@ -315,7 +315,7 @@
   <section class="rows" id="work">
 
     <!-- 01 Thi Thi (first, image LEFT) -->
-    <div class="prow tint" data-gallery="01-thi-thi" data-title="Thi Thi Garden House">
+    <div class="prow tint" id="01-thi-thi" data-gallery="01-thi-thi" data-title="Thi Thi Garden House">
       <div class="ph">
         <img src="projects/01-thi-thi/cover.jpg" alt="Thi Thi Garden House">
       </div>
@@ -332,7 +332,7 @@
     </div>
 
     <!-- 02 Bat Trang (image RIGHT) -->
-    <div class="prow alt" data-gallery="00-bat-trang" data-title="Bat Trang Pottery Showroom">
+    <div class="prow alt" id="00-bat-trang" data-gallery="00-bat-trang" data-title="Bat Trang Pottery Showroom">
       <div class="ph">
         <img src="projects/00-bat-trang/cover.jpg" alt="Bat Trang Pottery Showroom">
       </div>
@@ -349,7 +349,7 @@
     </div>
 
     <!-- 03 Quoc Anh (image LEFT) -->
-    <div class="prow" data-gallery="02-quoc-anh" data-title="Quoc Anh Beach Villa">
+    <div class="prow" id="02-quoc-anh" data-gallery="02-quoc-anh" data-title="Quoc Anh Beach Villa">
       <div class="ph">
         <img src="projects/02-quoc-anh/cover.jpg" alt="Quoc Anh Beach Villa">
       </div>
@@ -366,7 +366,7 @@
     </div>
 
     <!-- 04 Phu Tho House (image RIGHT) -->
-    <div class="prow alt tint-alt" data-gallery="03-phu-tho" data-title="Phu Tho House">
+    <div class="prow alt tint-alt" id="03-phu-tho" data-gallery="03-phu-tho" data-title="Phu Tho House">
       <div class="ph">
         <img src="projects/03-phu-tho/cover.jpg" alt="Phu Tho House">
       </div>
@@ -383,7 +383,7 @@
     </div>
 
     <!-- 05 Hado (image LEFT) -->
-    <div class="prow" data-gallery="04-hado" data-title="Hado Centrosa Apartment">
+    <div class="prow" id="04-hado" data-gallery="04-hado" data-title="Hado Centrosa Apartment">
       <div class="ph">
         <img src="projects/04-hado/cover.jpg" alt="Hado Centrosa Apartment">
       </div>
@@ -400,7 +400,7 @@
     </div>
 
     <!-- 06 Mimosa (image RIGHT) -->
-    <div class="prow alt" data-gallery="05-mimosa" data-title="Mimosa Coffee House">
+    <div class="prow alt" id="05-mimosa" data-gallery="05-mimosa" data-title="Mimosa Coffee House">
       <div class="ph">
         <img src="projects/05-mimosa/cover.jpg" alt="Mimosa Coffee House">
       </div>
@@ -665,14 +665,11 @@ menuBtn.addEventListener('click', e => {
   const open = menuDrop.classList.toggle('open');
   menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
 });
+// close menu when a project link is clicked (native anchor handles the scroll)
 menuDrop.querySelectorAll('a').forEach(a => {
-  a.addEventListener('click', e => {
-    e.preventDefault();
-    const slug = a.dataset.goto;
-    const target = document.querySelector('.prow[data-gallery="' + slug + '"]');
+  a.addEventListener('click', () => {
     menuDrop.classList.remove('open');
     menuBtn.setAttribute('aria-expanded', 'false');
-    if (target) target.scrollIntoView({behavior:'smooth', block:'start'});
   });
 });
 document.addEventListener('click', e => {
