@@ -506,7 +506,7 @@
 
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" style="display:none;position:fixed;inset:0;z-index:100;background:rgba(20,20,18,0.95);align-items:center;justify-content:center;flex-direction:column;overflow:hidden;">
-  <button id="lbClose" style="position:absolute;top:100px;right:32px;width:29px;height:29px;background:none;border:none;cursor:pointer;z-index:6;background-image:url(&quot;data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='48'%20height='48'%20viewBox='0%200%2048%2048'%3E%3Cpath%20d='M0%200%20L24%2014%20L14%2024%20Z'%20fill='white'/%3E%3Cpath%20d='M48%200%20L34%2024%20L24%2014%20Z'%20fill='white'/%3E%3Cpath%20d='M0%2048%20L14%2024%20L24%2034%20Z'%20fill='white'/%3E%3Cpath%20d='M48%2048%20L24%2034%20L34%2024%20Z'%20fill='white'/%3E%3Cpath%20d='M3%208%20L3%203%20L8%203'%20fill='none'%20stroke='white'%20stroke-width='1.5'/%3E%3Cpath%20d='M40%203%20L45%203%20L45%208'%20fill='none'%20stroke='white'%20stroke-width='1.5'/%3E%3Cpath%20d='M45%2040%20L45%2045%20L40%2045'%20fill='none'%20stroke='white'%20stroke-width='1.5'/%3E%3Cpath%20d='M8%2045%20L3%2045%20L3%2040'%20fill='none'%20stroke='white'%20stroke-width='1.5'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:center;background-size:29px 29px;opacity:.3;transition:background-size .18s ease, opacity .18s ease;"></button>
+  <button id="lbClose" style="position:absolute;top:96px;right:32px;width:44px;height:44px;background:none;border:none;cursor:pointer;z-index:6;background-image:url(&quot;data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='48'%20height='48'%20viewBox='0%200%2048%2048'%20fill-rule='evenodd'%3E%3Cpath%20fill='white'%20d='M2%202%20L12%202%20L12%2012%20L2%2012%20Z%20M46%202%20L36%202%20L36%2012%20L46%2012%20Z%20M2%2046%20L12%2046%20L12%2012%20L12%2036%20L2%2036%20Z%20M46%2046%20L36%2046%20L36%2036%20L46%2036%20Z%20M2%202%20L46%2046%20L40%2046%20L2%208%20Z%20M2%2046%20L46%202%20L46%208%20L8%2046%20Z'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:center;"></button>
   <button id="lbPrev" class="lb-nav-btn lb-prev" style="position:absolute;top:50%;left:32px;transform:translateY(-50%);" aria-label="Previous"></button>
   <button id="lbNext" class="lb-nav-btn lb-next" style="position:absolute;top:50%;right:32px;transform:translateY(-50%);" aria-label="Next"></button>
   <div id="lbStage" style="position:relative;width:82vw;height:76vh;perspective:1400px;">
@@ -540,6 +540,11 @@
     width:96px;height:80px;padding:0;
     background-repeat:no-repeat;background-position:center;background-size:60px 60px;
     transition:background-size .18s ease, filter .18s ease;
+  }
+  #lbClose{
+    background-size:29px 29px;
+    opacity:.3;
+    transition:background-size .18s ease, opacity .18s ease;
   }
   #lbClose:hover{opacity:1;background-size:38px 38px;}
   .lb-prev{   /* left button → right-pointing triangle */
