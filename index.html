@@ -692,9 +692,20 @@ document.addEventListener('click', function(e){
     var r = mb.getBoundingClientRect();
     extra = ' | MenuBtn rect: x=' + Math.round(r.left) + '-' + Math.round(r.right) + ' y=' + Math.round(r.top) + '-' + Math.round(r.bottom);
   }
+  // where is the dropdown actually rendered, and what is at its center?
+  var md = document.getElementById('menuDrop');
+  if (md){
+    var dr = md.getBoundingClientRect();
+    extra += ' | Dropdown rect: x=' + Math.round(dr.left) + '-' + Math.round(dr.right) + ' y=' + Math.round(dr.top) + '-' + Math.round(dr.bottom);
+    var cx = Math.round(dr.left + dr.width/2), cy = Math.round(dr.top + dr.height/2);
+    var atCenter = null;
+    try { atCenter = document.elementFromPoint(cx, cy); } catch (err) { atCenter = null; }
+    extra += ' | atDropdownCenter=' + (atCenter ? (atCenter.tagName + (atCenter.className ? '.' + atCenter.className : '') + (atCenter.id ? '#'+atCenter.id : '')) : 'null');
+  }
   var d = document.getElementById('diag');
   if (d){ d.style.display='block'; d.textContent = 'e.target=' + info + ' | elementFromPoint=' + atInfo + extra; }
 }, true);  // <-- capture phase (runs before anything else)
+
 function showDiag(msg){
   var d = document.getElementById('diag');
   if (d){ d.textContent = msg; d.style.display = 'block'; }
