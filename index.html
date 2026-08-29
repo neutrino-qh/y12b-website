@@ -143,7 +143,8 @@
   .hero-kicker::after{left:calc(100% + 24px);}
   .hero-h1{font-size:clamp(48px,7.5vw,110px);line-height:1.02;font-weight:400;letter-spacing:-0.03em;}
   .hero-h1 .it{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;}
-.hero-h1 .it{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;}
+.hero-h1 .ch{display:inline-block;white-space:pre;will-change:transform;}
+.hero-h1 .word.it .ch{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;}
 
   /* ============ PROJECT ROWS — 4 cells: 2 text + 2 image ============ */
   .rows{border-top:1px solid var(--line-strong);}
@@ -310,7 +311,7 @@
   <!-- HERO -->
   <header class="hero">
       <div class="hero-kicker">from hue, based in saigon</div>
-      <h1 class="hero-h1">Shaping <span class="it">your</span><br>future space</h1>
+      <h1 class="hero-h1" id="heroTitle"><span class="word" data-text="Shaping "></span><span class="word it" data-text="your"></span><br><span class="word" data-text="future space"></span></h1>
   </header>
 
   <!-- PROJECT ROWS: 1 project per row, square grid -->
@@ -727,6 +728,61 @@ if (menuBtn) menuBtn.addEventListener('click', toggleMenu);
 document.addEventListener('click', function(e){
   if (menuDrop.classList.contains('open') && !menuDrop.contains(e.target) && e.target !== menuBtn) closeMenu();
 });
+
+/* ---- HERO TEXT SCRAMBLE (cursor-proximity, slow) ---- */
+(function(){
+  const title = document.getElementById('heroTitle');
+  if (!title) return;
+  const CHARS = '!<>-_\\/[]{}—=+*^?#¥%&@§∆◊';
+  const RADIUS = 150, LIFT = 0.5;
+  const SWAP_MS = 130, SCR_MIN = 900, SCR_MAX = 1800, COOLDOWN = 1200;
+  const chars = [];
+  title.querySelectorAll('.word').forEach(word=>{
+    const text = word.dataset.text;
+    word.textContent = '';
+    for (const c of text){
+      const sp = document.createElement('span');
+      sp.className = 'ch';
+      sp.textContent = c;
+      word.appendChild(sp);
+      chars.push({ el: sp, final: c, x:0, y:0, lift:0, scrambling:false, until:0, lastSwap:0, cooldownUntil:0 });
+    }
+  });
+  function measure(){
+    chars.forEach(ch=>{ const r = ch.el.getBoundingClientRect(); ch.x = r.left + r.width/2; ch.y = r.top + r.height/2; });
+  }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+  window.addEventListener('load', measure);
+  window.addEventListener('resize', measure);
+  setTimeout(measure, 300);
+  let mx = -9999, my = -9999, inside = false;
+  title.addEventListener('mousemove', e=>{ mx=e.clientX; my=e.clientY; inside=true; });
+  title.addEventListener('mouseleave', ()=>{ inside=false; mx=my=-9999; });
+  const lerp = (a,b,t)=> a + (b-a)*t;
+  function frame(now){
+    chars.forEach(ch=>{
+      const d = Math.hypot(mx - ch.x, my - ch.y);
+      let strength = inside ? Math.max(0, 1 - d/RADIUS) : 0;
+      strength = Math.pow(strength, 1.25);
+      const targetLift = -strength * LIFT;
+      ch.lift = lerp(ch.lift, targetLift, 0.06);
+      ch.el.style.transform = 'translateY('+ch.lift.toFixed(3)+'em)';
+      if (inside && strength > 0.35 && !ch.scrambling && now > ch.cooldownUntil){
+        ch.scrambling = true;
+        ch.until = now + SCR_MIN + Math.random()*(SCR_MAX-SCR_MIN);
+        ch.lastSwap = 0;
+      }
+      if (ch.scrambling){
+        if (now - ch.lastSwap > SWAP_MS){ ch.el.textContent = CHARS[(Math.random()*CHARS.length)|0]; ch.lastSwap = now; }
+        if (now > ch.until){ ch.scrambling=false; ch.el.textContent=ch.final; ch.cooldownUntil=now+COOLDOWN; }
+      } else if (strength <= 0.35){
+        ch.el.textContent = ch.final;
+      }
+    });
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
 </script>
 
 </body>

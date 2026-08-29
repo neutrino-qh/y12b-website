@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Y12B — Cursor-proximity Text Scramble</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#f4f4f0; --fg:#141413; --muted:#8a877e; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{ background:var(--bg);color:var(--fg);font-family:'Inter',system-ui,sans-serif;
+        min-height:100vh;display:flex;flex-direction:column;align-items:center;
+        justify-content:center;gap:60px;-webkit-font-smoothing:antialiased; }
+  .hero-kicker{ font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);
+        position:relative;display:inline-block; }
+  .hero-kicker::before,.hero-kicker::after{ content:'';position:absolute;top:50%;width:120px;height:1px;
+        background:var(--fg);opacity:.25; }
+  .hero-kicker::before{right:calc(100% + 24px);}
+  .hero-kicker::after{left:calc(100% + 24px);}
+
+  .hero-h1{ font-size:clamp(48px,7.5vw,110px);line-height:1.02;font-weight:400;
+        letter-spacing:-0.03em;text-align:center;user-select:none; }
+  .hero-h1 .it{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;}
+  .hero-h1 .ch{ display:inline-block;white-space:pre;will-change:transform; }
+
+  .hint{ font-size:12px;color:var(--muted);letter-spacing:.04em;max-width:420px;text-align:center;line-height:1.5; }
+</style>
+</head>
+<body>
+  <div class="hero-kicker">from hue, based in saigon</div>
+  <h1 class="hero-h1" id="heroTitle">
+    <span class="word" data-text="Shaping "></span><span class="word it" data-text="your"></span><br><span class="word" data-text="future space"></span>
+  </h1>
+  <div class="hint">di chuột <b>qua lại</b> trên dòng chữ — những chữ gần con trỏ sẽ nhảy lên và đảo lộn; chữ càng xa càng yên. Hiệu ứng chậm, bám theo vị trí chuột.</div>
+
+<script>
+(function(){
+  const title = document.getElementById('heroTitle');
+  const CHARS = '!<>-_\\/[]{}—=+*^?#¥%&@§∆◊';
+  const RADIUS = 150;            // px — vùng ảnh hưởng quanh con trỏ
+  const LIFT   = 0.5;            // em — độ nhảy tối đa ở tâm
+  const SWAP_MS = 130;           // ms — tốc độ đổi ký tự scramble (lớn = chậm)
+  const SCR_MIN = 900, SCR_MAX = 1800; // ms — thời gian lộn xộn (chậm)
+  const COOLDOWN = 1200;         // ms — nghỉ trước khi lộn xộn lại
+
+  // --- wrap mỗi ký tự ---
+  const chars = [];
+  let i = 0;
+  title.querySelectorAll('.word').forEach(word=>{
+    const text = word.dataset.text;
+    word.textContent = '';
+    for (const c of text){
+      const sp = document.createElement('span');
+      sp.className = 'ch';
+      sp.textContent = c;
+      sp.dataset.final = c;
+      word.appendChild(sp);
+      chars.push({ el: sp, final: c, x:0, y:0, lift:0, scrambling:false, until:0, lastSwap:0, cooldownUntil:0 });
+    }
+  });
+
+  // --- đo tâm mỗi ký tự (sau khi font load + khi resize) ---
+  function measure(){
+    chars.forEach(ch=>{
+      const r = ch.el.getBoundingClientRect();
+      ch.x = r.left + r.width/2;
+      ch.y = r.top  + r.height/2;
+    });
+  }
+  if (document.fonts && document.fonts.ready){ document.fonts.ready.then(measure); }
+  window.addEventListener('load', measure);
+  window.addEventListener('resize', measure);
+  setTimeout(measure, 300);
+
+  // --- con trỏ ---
+  let mx = -9999, my = -9999, inside = false;
+  title.addEventListener('mousemove', e=>{ mx=e.clientX; my=e.clientY; inside=true; });
+  title.addEventListener('mouseleave', ()=>{ inside=false; mx=my=-9999; });
+
+  function lerp(a,b,t){ return a + (b-a)*t; }
+
+  function frame(now){
+    chars.forEach(ch=>{
+      const d = Math.hypot(mx - ch.x, my - ch.y);
+      let strength = inside ? Math.max(0, 1 - d/RADIUS) : 0;
+      strength = Math.pow(strength, 1.25);            // falloff mượt
+      // nhảy: bám sát proximity, lerp để mượt & chậm
+      const targetLift = -strength * LIFT;
+      ch.lift = lerp(ch.lift, targetLift, 0.06);
+      ch.el.style.transform = `translateY(${ch.lift.toFixed(3)}em)`;
+
+      // scramble chỉ khi đủ gần & hết cooldown
+      if (inside && strength > 0.35 && !ch.scrambling && now > ch.cooldownUntil){
+        ch.scrambling = true;
+        ch.until = now + SCR_MIN + Math.random()*(SCR_MAX-SCR_MIN);
+        ch.lastSwap = 0;
+      }
+      if (ch.scrambling){
+        if (now - ch.lastSwap > SWAP_MS){
+          ch.el.textContent = CHARS[(Math.random()*CHARS.length)|0];
+          ch.lastSwap = now;
+        }
+        if (now > ch.until){ ch.scrambling=false; ch.el.textContent=ch.final; ch.cooldownUntil=now+COOLDOWN; }
+      } else if (strength <= 0.35){
+        // đảm bảo chữ về đúng khi chuột rời xa
+        ch.el.textContent = ch.final;
+      }
+    });
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
