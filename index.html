@@ -639,7 +639,7 @@ function go(newIdx, dir){
   // place incoming on the correct side
   newEl.style.transition = 'none';
   newEl.className = 'lb-slide';
-  newEl.style.transform = dir > 0 ? 'translateX(-60%) scale(.9)' : 'translateX(60%) scale(.9)';
+  newEl.style.transform = dir > 0 ? 'translateX(60%) scale(.9)' : 'translateX(-60%) scale(.9)';
   newEl.style.opacity = '0';
   void newEl.offsetWidth;   // force reflow
   newEl.style.transition = '';
@@ -671,8 +671,8 @@ document.querySelectorAll('.index-row[data-gallery], .prow[data-gallery]').forEa
 });
 function closeLb(){ lb.style.display = 'none'; document.body.classList.remove('lb-open'); document.body.style.overflow = ''; }
 document.getElementById('lbClose').onclick = closeLb;
-document.getElementById('lbPrev').onclick = e => { e.stopPropagation(); go((curIdx + 1) % curList.length, 1); };
-document.getElementById('lbNext').onclick = e => { e.stopPropagation(); go((curIdx - 1 + curList.length) % curList.length, -1); };
+document.getElementById('lbPrev').onclick = e => { e.stopPropagation(); go((curIdx - 1 + curList.length) % curList.length, -1); };
+document.getElementById('lbNext').onclick = e => { e.stopPropagation(); go((curIdx + 1) % curList.length, 1); };
 lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
 document.addEventListener('keydown', e => {
   if (lb.style.display !== 'flex') return;
