@@ -680,15 +680,20 @@ function toggleMenu(e){
 document.addEventListener('click', function(e){
   var t = e.target;
   var info = t ? (t.tagName + (t.className ? '.' + t.className : '') + (t.id ? '#'+t.id : '')) : 'null';
+  // what element is actually rendered at the click point (catches overlays)
+  var atPoint = null;
+  try {
+    atPoint = document.elementFromPoint(e.clientX, e.clientY);
+  } catch (err) { atPoint = null; }
+  var atInfo = atPoint ? (atPoint.tagName + (atPoint.className ? '.' + atPoint.className : '') + (atPoint.id ? '#'+atPoint.id : '')) : 'null';
   var extra = '';
-  // report the Menu button's box so we can see if it overlaps the dropdown
   var mb = document.getElementById('menuBtn');
   if (mb){
     var r = mb.getBoundingClientRect();
     extra = ' | MenuBtn rect: x=' + Math.round(r.left) + '-' + Math.round(r.right) + ' y=' + Math.round(r.top) + '-' + Math.round(r.bottom);
   }
   var d = document.getElementById('diag');
-  if (d){ d.style.display='block'; d.textContent = 'CLICK landed on: ' + info + extra; }
+  if (d){ d.style.display='block'; d.textContent = 'e.target=' + info + ' | elementFromPoint=' + atInfo + extra; }
 }, true);  // <-- capture phase (runs before anything else)
 function showDiag(msg){
   var d = document.getElementById('diag');
