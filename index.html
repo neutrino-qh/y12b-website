@@ -51,13 +51,14 @@
   .menu-btn{
     font:inherit;font-size:12px;letter-spacing:.18em;text-transform:uppercase;
     color:var(--ink);background:none;border:none;cursor:pointer;padding:4px 0;
+    position:relative;z-index:10;
   }
   .menu-btn:hover{opacity:.55;}
   .menu-drop{
-    position:absolute;top:100%;left:0;right:0;width:100%;
+    position:fixed;top:0;left:0;width:100%;
     background:var(--bg);border-top:1px solid var(--line);
     display:none;grid-template-columns:repeat(4,1fr);
-    gap:0;z-index:400;
+    gap:0;z-index:400;pointer-events:auto;
   }
   .menu-drop.open{display:grid;}
   .menu-group{padding:32px 48px;border-right:1px solid var(--line);}
@@ -277,7 +278,15 @@
     <div class="nav-side nav-menu">
       <button class="menu-btn" id="menuBtn" aria-expanded="false">Menu</button>
     </div>
-    <div class="menu-drop" id="menuDrop">
+    <div class="nav-logo">
+      <a href="#">Y12B</a>
+      <div class="nav-tagline">THINKING &amp; DOING ARCHITECTURE</div>
+    </div>
+    <a class="nav-side" href="#contact">Contacts</a>
+  </nav>
+
+  <!-- MENU DROPDOWN (sibling of nav, position:fixed so it is never inside nav's grid/sticky containing block) -->
+  <div class="menu-drop" id="menuDrop">
         <div class="menu-group">
           <div class="menu-cat">Residential</div>
           <a href="#01-thi-thi" onclick="return goToProject('01-thi-thi')">Thi Thi Garden House</a>
@@ -297,12 +306,6 @@
           <a href="#05-mimosa" onclick="return goToProject('05-mimosa')">Mimosa Coffee House</a>
         </div>
       </div>
-    <div class="nav-logo">
-      <a href="#">Y12B</a>
-      <div class="nav-tagline">THINKING &amp; DOING ARCHITECTURE</div>
-    </div>
-    <a class="nav-side" href="#contact">Contacts</a>
-  </nav>
 
   <!-- HERO -->
   <header class="hero">
@@ -675,59 +678,26 @@ function toggleMenu(e){
   if (e && e.stopPropagation) e.stopPropagation();
   var open = menuDrop.classList.toggle('open');
   menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
-}
-// DIAGNOSTIC: capture every click at the top level and show what element actually received it
-document.addEventListener('click', function(e){
-  var t = e.target;
-  var info = t ? (t.tagName + (t.className ? '.' + t.className : '') + (t.id ? '#'+t.id : '')) : 'null';
-  // what element is actually rendered at the click point (catches overlays)
-  var atPoint = null;
-  try {
-    atPoint = document.elementFromPoint(e.clientX, e.clientY);
-  } catch (err) { atPoint = null; }
-  var atInfo = atPoint ? (atPoint.tagName + (atPoint.className ? '.' + atPoint.className : '') + (atPoint.id ? '#'+atPoint.id : '')) : 'null';
-  var extra = '';
-  var mb = document.getElementById('menuBtn');
-  if (mb){
-    var r = mb.getBoundingClientRect();
-    extra = ' | MenuBtn rect: x=' + Math.round(r.left) + '-' + Math.round(r.right) + ' y=' + Math.round(r.top) + '-' + Math.round(r.bottom);
+  if (open){
+    // pin dropdown just below the (sticky) nav, in viewport coordinates
+    var nav = menuBtn.closest('nav');
+    var navBottom = nav ? nav.getBoundingClientRect().bottom : 0;
+    menuDrop.style.top = navBottom + 'px';
   }
-  // where is the dropdown actually rendered, and what is at its center?
-  var md = document.getElementById('menuDrop');
-  if (md){
-    var dr = md.getBoundingClientRect();
-    extra += ' | Dropdown rect: x=' + Math.round(dr.left) + '-' + Math.round(dr.right) + ' y=' + Math.round(dr.top) + '-' + Math.round(dr.bottom);
-    var cx = Math.round(dr.left + dr.width/2), cy = Math.round(dr.top + dr.height/2);
-    var atCenter = null;
-    try { atCenter = document.elementFromPoint(cx, cy); } catch (err) { atCenter = null; }
-    extra += ' | atDropdownCenter=' + (atCenter ? (atCenter.tagName + (atCenter.className ? '.' + atCenter.className : '') + (atCenter.id ? '#'+atCenter.id : '')) : 'null');
-  }
-  var d = document.getElementById('diag');
-  if (d){ d.style.display='block'; d.textContent = 'e.target=' + info + ' | elementFromPoint=' + atInfo + extra; }
-}, true);  // <-- capture phase (runs before anything else)
-
-function showDiag(msg){
-  var d = document.getElementById('diag');
-  if (d){ d.textContent = msg; d.style.display = 'block'; }
 }
 function goToProject(slug){
   var target = document.getElementById(slug);
   if (target){
     target.scrollIntoView({behavior:'smooth', block:'start'});
-    showDiag('OK: scrolled to ' + slug);
-  } else {
-    showDiag('THIEU target: ' + slug);
   }
   setTimeout(closeMenu, 450);
   return false;
 }
 if (menuBtn) menuBtn.addEventListener('click', toggleMenu);
 document.addEventListener('click', function(e){
-  if (!menuDrop.contains(e.target) && e.target !== menuBtn) closeMenu();
+  if (menuDrop.classList.contains('open') && !menuDrop.contains(e.target) && e.target !== menuBtn) closeMenu();
 });
 </script>
-
-<div id="diag" style="display:none;position:fixed;left:16px;bottom:16px;z-index:9999;background:#f4f4f0;color:#141413;padding:8px 14px;font:12px/1.4 monospace;max-width:80vw;"></div>
 
 </body>
 </html>
