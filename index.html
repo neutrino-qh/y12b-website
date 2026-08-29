@@ -96,15 +96,15 @@
 #pixelfield.on{display:block;}
 #pixelfield canvas{position:absolute;inset:0;width:100%;height:100%;}
   #crosshair{
-    position:fixed;inset:0;pointer-events:none !important;z-index:90;display:none;
+    position:fixed;inset:0;pointer-events:none !important;z-index:500;display:none;
   }
   #crosshair .ch-v{
     position:absolute;top:0;bottom:0;width:1px;
-    background:rgba(240,240,236,0.18);
+    background:rgba(255,255,255,0.45);mix-blend-mode:difference;
   }
   #crosshair .ch-h{
     position:absolute;left:0;right:0;height:1px;
-    background:rgba(240,240,236,0.18);
+    background:rgba(255,255,255,0.45);mix-blend-mode:difference;
   }
   #crosshair .ch-plus{
     position:absolute;width:20px;height:20px;transform:translate(-50%,-50%);
@@ -112,20 +112,20 @@
   }
   #crosshair .ch-plus::before,
   #crosshair .ch-plus::after{
-    content:'';position:absolute;background:rgba(240,240,236,0.6);
+    content:'';position:absolute;background:rgba(255,255,255,0.85);mix-blend-mode:difference;
     transition:background .15s ease, box-shadow .15s ease;
   }
   #crosshair .ch-plus::before{left:0;right:0;top:50%;height:1.5px;transform:translateY(-50%);}
   #crosshair .ch-plus::after{top:0;bottom:0;left:50%;width:1.5px;transform:translateX(-50%);}
   body.crosshair-hover #crosshair .ch-plus::before,
   body.crosshair-hover #crosshair .ch-plus::after{
-    background:rgba(240,240,236,0.95);
-    box-shadow:0 0 0 0.5px rgba(240,240,236,0.45);
+    background:rgba(255,255,255,1);mix-blend-mode:difference;
+    box-shadow:0 0 6px rgba(255,255,255,0.6);
   }
   #crosshair .ch-coord{
     position:absolute;transform:translate(14px,14px);
-    font-size:10px;letter-spacing:.12em;color:rgba(240,240,236,0.55);
-    background:rgba(20,20,19,0.6);padding:3px 8px;
+    font-size:10px;letter-spacing:.12em;color:rgba(255,255,255,0.7);mix-blend-mode:difference;
+    background:transparent;padding:3px 8px;
     font-variant-numeric:tabular-nums;white-space:nowrap;
   }
   body.crosshair-on, body.crosshair-on *{cursor:none;}
@@ -539,14 +539,7 @@
   document.addEventListener('mousemove', e => {
     if (raf) return;
     raf = requestAnimationFrame(() => {
-      // hide crosshair while the menu dropdown is open so it never overlays menu links
-      var menuOpen = document.getElementById('menuDrop') && document.getElementById('menuDrop').classList.contains('open');
-      if (menuOpen) {
-        ch.style.display = 'none';
-        document.body.classList.remove('crosshair-on');
-        raf = null;
-        return;
-      }
+      // crosshair now stays visible everywhere (incl. over the open menu) — it has pointer-events:none so it never blocks clicks
       ch.style.display = 'block';
       document.body.classList.add('crosshair-on');
       v.style.left = e.clientX + 'px';
