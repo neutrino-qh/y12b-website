@@ -665,11 +665,15 @@ menuBtn.addEventListener('click', e => {
   const open = menuDrop.classList.toggle('open');
   menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
 });
-// close menu when a project link is clicked (native anchor handles the scroll)
+// clicking a project name -> smooth-scroll to that project's image
 menuDrop.querySelectorAll('a').forEach(a => {
-  a.addEventListener('click', () => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const slug = a.getAttribute('href').slice(1);   // "#01-thi-thi" -> "01-thi-thi"
+    const target = document.getElementById(slug);
     menuDrop.classList.remove('open');
     menuBtn.setAttribute('aria-expanded', 'false');
+    if (target) target.scrollIntoView({behavior:'smooth', block:'start'});
   });
 });
 document.addEventListener('click', e => {
