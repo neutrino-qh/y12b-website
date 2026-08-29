@@ -676,6 +676,13 @@ function toggleMenu(e){
   var open = menuDrop.classList.toggle('open');
   menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
 }
+// DIAGNOSTIC: capture every click at the top level and show what element actually received it
+document.addEventListener('click', function(e){
+  var t = e.target;
+  var info = t ? (t.tagName + (t.className ? '.' + t.className : '') + (t.id ? '#'+t.id : '')) : 'null';
+  var d = document.getElementById('diag');
+  if (d){ d.style.display='block'; d.textContent = 'CLICK landed on: ' + info; }
+}, true);  // <-- capture phase (runs before anything else)
 function showDiag(msg){
   var d = document.getElementById('diag');
   if (d){ d.textContent = msg; d.style.display = 'block'; }
