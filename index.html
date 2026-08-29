@@ -46,25 +46,32 @@
   .nav-side{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink);text-decoration:none;padding-top:4px;}
   .nav-side:last-child{text-align:right;justify-self:end;}
   .nav-side:hover{opacity:.55;}
-  /* dropdown menu */
-  .nav-menu{position:relative;}
+  /* dropdown menu — full-width, borderless, grouped by category */
+  .nav-menu{position:static;}
   .menu-btn{
     font:inherit;font-size:12px;letter-spacing:.18em;text-transform:uppercase;
     color:var(--ink);background:none;border:none;cursor:pointer;padding:4px 0;
   }
   .menu-btn:hover{opacity:.55;}
   .menu-drop{
-    position:absolute;top:calc(100% + 14px);left:0;min-width:240px;
-    background:var(--bg-soft);border:1px solid var(--line-strong);
-    display:none;flex-direction:column;z-index:200;
+    position:absolute;top:100%;left:0;right:0;width:100%;
+    background:var(--bg);
+    display:none;grid-template-columns:repeat(4,1fr);
+    gap:0;z-index:200;
+    border-top:1px solid var(--line);
   }
-  .menu-drop.open{display:flex;}
+  .menu-drop.open{display:grid;}
+  .menu-group{padding:32px 48px;border-right:1px solid var(--line);}
+  .menu-group:last-child{border-right:none;}
+  .menu-cat{
+    font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);
+    margin-bottom:18px;
+  }
   .menu-drop a{
-    color:var(--ink);text-decoration:none;font-size:13px;letter-spacing:.04em;
-    padding:11px 18px;border-bottom:1px solid var(--line);white-space:nowrap;
+    display:block;color:var(--ink);text-decoration:none;font-size:15px;letter-spacing:.02em;
+    padding:9px 0;white-space:nowrap;
   }
-  .menu-drop a:last-child{border-bottom:none;}
-  .menu-drop a:hover{background:var(--bg-dim);}
+  .menu-drop a:hover{opacity:.55;}
   .nav-logo{text-align:center;line-height:1;}
   .nav-logo a{
     color:var(--ink);text-decoration:none;font-weight:700;font-size:22px;
@@ -253,6 +260,12 @@
     .contact{padding:80px 28px 48px;}
     .contact-row{grid-template-columns:1fr;gap:6px;}
     .hero{padding:100px 20px 120px;}
+    .menu-drop{grid-template-columns:1fr 1fr;}
+    .menu-group{padding:24px 28px;border-right:none;border-bottom:1px solid var(--line);}
+    .menu-group:last-child{border-bottom:none;}
+  }
+  @media (max-width:560px){
+    .menu-drop{grid-template-columns:1fr;}
   }
 </style>
 </head>
@@ -265,12 +278,24 @@
     <div class="nav-side nav-menu">
       <button class="menu-btn" id="menuBtn" aria-expanded="false">Menu</button>
       <div class="menu-drop" id="menuDrop">
-        <a href="#work" data-goto="01-thi-thi">Thi Thi Garden House</a>
-        <a href="#work" data-goto="00-bat-trang">Bat Trang Pottery Showroom</a>
-        <a href="#work" data-goto="02-quoc-anh">Quoc Anh Beach Villa</a>
-        <a href="#work" data-goto="03-phu-tho">Phu Tho House</a>
-        <a href="#work" data-goto="04-hado">Hado Centrosa Apartment</a>
-        <a href="#work" data-goto="05-mimosa">Mimosa Coffee House</a>
+        <div class="menu-group">
+          <div class="menu-cat">Residential</div>
+          <a href="#work" data-goto="01-thi-thi">Thi Thi Garden House</a>
+          <a href="#work" data-goto="02-quoc-anh">Quoc Anh Beach Villa</a>
+          <a href="#work" data-goto="03-phu-tho">Phu Tho House</a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-cat">Exhibition</div>
+          <a href="#work" data-goto="00-bat-trang">Bat Trang Pottery Showroom</a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-cat">Interior</div>
+          <a href="#work" data-goto="04-hado">Hado Centrosa Apartment</a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-cat">F &amp; B</div>
+          <a href="#work" data-goto="05-mimosa">Mimosa Coffee House</a>
+        </div>
       </div>
     </div>
     <div class="nav-logo">
@@ -289,8 +314,8 @@
   <!-- PROJECT ROWS: 1 project per row, square grid -->
   <section class="rows" id="work">
 
-    <!-- 01 Thi Thi (swapped from 02) -->
-    <div class="prow alt tint" data-gallery="01-thi-thi" data-title="Thi Thi Garden House">
+    <!-- 01 Thi Thi (first, image LEFT) -->
+    <div class="prow tint" data-gallery="01-thi-thi" data-title="Thi Thi Garden House">
       <div class="ph">
         <img src="projects/01-thi-thi/cover.jpg" alt="Thi Thi Garden House">
       </div>
@@ -306,8 +331,8 @@
       </div>
     </div>
 
-    <!-- 02 Bat Trang (swapped from 01) -->
-    <div class="prow" data-gallery="00-bat-trang" data-title="Bat Trang Pottery Showroom">
+    <!-- 02 Bat Trang (image RIGHT) -->
+    <div class="prow alt" data-gallery="00-bat-trang" data-title="Bat Trang Pottery Showroom">
       <div class="ph">
         <img src="projects/00-bat-trang/cover.jpg" alt="Bat Trang Pottery Showroom">
       </div>
@@ -323,7 +348,7 @@
       </div>
     </div>
 
-    <!-- 03 Quoc Anh -->
+    <!-- 03 Quoc Anh (image LEFT) -->
     <div class="prow" data-gallery="02-quoc-anh" data-title="Quoc Anh Beach Villa">
       <div class="ph">
         <img src="projects/02-quoc-anh/cover.jpg" alt="Quoc Anh Beach Villa">
@@ -340,7 +365,7 @@
       </div>
     </div>
 
-    <!-- 04 Phu Tho House -->
+    <!-- 04 Phu Tho House (image RIGHT) -->
     <div class="prow alt tint-alt" data-gallery="03-phu-tho" data-title="Phu Tho House">
       <div class="ph">
         <img src="projects/03-phu-tho/cover.jpg" alt="Phu Tho House">
@@ -357,7 +382,7 @@
       </div>
     </div>
 
-    <!-- 05 Hado -->
+    <!-- 05 Hado (image LEFT) -->
     <div class="prow" data-gallery="04-hado" data-title="Hado Centrosa Apartment">
       <div class="ph">
         <img src="projects/04-hado/cover.jpg" alt="Hado Centrosa Apartment">
@@ -374,8 +399,8 @@
       </div>
     </div>
 
-    <!-- 06 Mimosa -->
-    <div class="prow alt tint" data-gallery="05-mimosa" data-title="Mimosa Coffee House">
+    <!-- 06 Mimosa (image RIGHT) -->
+    <div class="prow alt" data-gallery="05-mimosa" data-title="Mimosa Coffee House">
       <div class="ph">
         <img src="projects/05-mimosa/cover.jpg" alt="Mimosa Coffee House">
       </div>
