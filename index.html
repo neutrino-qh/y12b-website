@@ -69,9 +69,9 @@
   }
   .menu-drop a{
     display:block;color:var(--muted);text-decoration:none;font-size:12px;letter-spacing:.04em;text-transform:uppercase;
-    padding:6px 0;white-space:nowrap;
+    padding:6px 0;white-space:nowrap;font-weight:400;transition:color .15s ease, font-weight .15s ease;
   }
-  .menu-drop a:hover{opacity:.55;color:var(--ink);}
+  .menu-drop a:hover{opacity:1;color:var(--ink);font-weight:700;}
   .nav-logo{text-align:center;line-height:1;}
   .nav-logo a{
     color:var(--ink);text-decoration:none;font-weight:700;font-size:22px;
@@ -660,27 +660,30 @@ lb.addEventListener('touchend', e => {
 /* ---- TOP MENU DROPDOWN ---- */
 const menuBtn = document.getElementById('menuBtn');
 const menuDrop = document.getElementById('menuDrop');
+function closeMenu(){
+  menuDrop.classList.remove('open');
+  menuBtn.setAttribute('aria-expanded', 'false');
+}
 menuBtn.addEventListener('click', e => {
   e.stopPropagation();
   const open = menuDrop.classList.toggle('open');
   menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
 });
-// clicking a project name -> smooth-scroll to that project's image
-menuDrop.querySelectorAll('a').forEach(a => {
-  a.addEventListener('click', e => {
-    e.preventDefault();
-    const slug = a.getAttribute('href').slice(1);   // "#01-thi-thi" -> "01-thi-thi"
-    const target = document.getElementById(slug);
-    menuDrop.classList.remove('open');
-    menuBtn.setAttribute('aria-expanded', 'false');
-    if (target) target.scrollIntoView({behavior:'smooth', block:'start'});
-  });
+// Click a project name -> smooth-scroll to that project's image+info
+menuDrop.addEventListener('click', e => {
+  const a = e.target.closest('a');
+  if (!a) return;
+  e.preventDefault();
+  const slug = a.getAttribute('href').slice(1);          // "#01-thi-thi" -> "01-thi-thi"
+  const target = document.getElementById(slug);
+  if (target) {
+    const y = target.getBoundingClientRect().top + window.scrollY - 80;  // 80px clears sticky nav
+    window.scrollTo({ top: y, behavior: 'smooth' });
+  }
+  setTimeout(closeMenu, 450);   // close AFTER the scroll starts (so it isn't cancelled)
 });
 document.addEventListener('click', e => {
-  if (!menuDrop.contains(e.target) && e.target !== menuBtn) {
-    menuDrop.classList.remove('open');
-    menuBtn.setAttribute('aria-expanded', 'false');
-  }
+  if (!menuDrop.contains(e.target) && e.target !== menuBtn) closeMenu();
 });
 </script>
 
