@@ -528,13 +528,11 @@
     cursor:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='22'%20height='22'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%202%20L22%2021%20L2%2021%20Z'%20fill='black'%20stroke='white'%20stroke-width='1.5'%20stroke-linejoin='round'/%3E%3C/svg%3E") 2 2, auto !important;
   }
   #lbDots .dot{
-    width:18px;height:16px;border:none;padding:0;cursor:pointer;background-color:transparent;
-    background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='18'%20height='16'%20viewBox='0%200%2018%2016'%3E%3Cpath%20d='M9%201.5%20L16.5%2014.5%20L1.5%2014.5%20Z'%20fill='white'/%3E%3C/svg%3E");
-    background-repeat:no-repeat;background-position:center;background-size:contain;
-    opacity:.4;transition:transform .18s ease,opacity .18s ease;
+    width:14px;height:14px;border:none;padding:0;cursor:pointer;background-color:rgba(255,255,255,.4);
+    transition:transform .18s ease, opacity .18s ease, background-color .18s ease;
   }
   #lbDots .dot.on{
-    background-color:transparent;opacity:1;transform:scale(1.25);
+    background-color:#fff;opacity:1;transform:scale(1.25);
   }
   /* gallery prev/next: triangle arrows, larger hit area, no square highlight */
   .lb-nav-btn{
@@ -545,12 +543,15 @@
   }
   .lb-prev{   /* left button → right-pointing triangle */
     background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='60'%20height='60'%20viewBox='0%200%2060%2060'%3E%3Cpath%20d='M50%206%20L6%2030%20L50%2054%20Z'%20fill='white'/%3E%3C/svg%3E");
+    opacity:.3;
   }
   .lb-next{   /* right button → left-pointing triangle */
     background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='60'%20height='60'%20viewBox='0%200%2060%2060'%3E%3Cpath%20d='M10%206%20L54%2030%20L10%2054%20Z'%20fill='white'/%3E%3C/svg%3E");
+    opacity:.3;
   }
   .lb-nav-btn:hover{
     background-size:78px 78px;   /* grow on hover */
+    opacity:1;
   }
 </style>
 
