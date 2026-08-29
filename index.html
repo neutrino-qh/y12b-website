@@ -507,14 +507,14 @@
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" style="display:none;position:fixed;inset:0;z-index:100;background:rgba(20,20,18,0.95);align-items:center;justify-content:center;flex-direction:column;overflow:hidden;">
   <button id="lbClose" style="position:absolute;top:24px;right:32px;background:none;border:none;color:#f4f4f0;font-size:30px;cursor:pointer;z-index:5;">×</button>
-  <button id="lbPrev" class="lb-nav-btn lb-prev" style="position:absolute;top:50%;left:32px;transform:translateY(-50%);">‹</button>
-  <button id="lbNext" class="lb-nav-btn lb-next" style="position:absolute;top:50%;right:32px;transform:translateY(-50%);">›</button>
+  <button id="lbPrev" class="lb-nav-btn lb-prev" style="position:absolute;top:50%;left:32px;transform:translateY(-50%);" aria-label="Previous"></button>
+  <button id="lbNext" class="lb-nav-btn lb-next" style="position:absolute;top:50%;right:32px;transform:translateY(-50%);" aria-label="Next"></button>
   <div id="lbStage" style="position:relative;width:82vw;height:76vh;perspective:1400px;">
     <img id="lbImgA" src="" alt="" class="lb-slide" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;">
     <img id="lbImgB" src="" alt="" class="lb-slide" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;">
   </div>
-  <div id="lbCaption" style="color:rgba(244,244,240,.6);font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin-top:16px;"></div>
-  <div id="lbDots" style="display:flex;gap:8px;margin-top:14px;"></div>
+  <div id="lbCaption" style="display:none;"></div>
+  <div id="lbDots" style="display:flex;gap:10px;margin-top:18px;"></div>
 </div>
 
 <style>
@@ -527,19 +527,38 @@
   body.lb-open, body.lb-open *{
     cursor:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='22'%20height='22'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%202%20L22%2021%20L2%2021%20Z'%20fill='black'%20stroke='white'%20stroke-width='1.5'%20stroke-linejoin='round'/%3E%3C/svg%3E") 2 2, auto !important;
   }
-  #lbDots .dot{width:22px;height:3px;background:rgba(244,244,240,.25);cursor:pointer;transition:background .3s;border:none;padding:0;}
-  #lbDots .dot.on{background:#f4f4f0;}
-  /* gallery prev/next: larger hit area + grow on hover */
+  #lbDots .dot{
+    width:18px;height:16px;border:none;padding:0;cursor:pointer;
+    background-image:url("data:image/svg+xml,%3Csvg%20width='18'%20height='16'%20viewBox='0%200%2018%2016'%3E%3Cpath%20d='M9%201%20L17%2015%20L1%2015%20Z'%20fill='white'/%3E%3Cpath%20d='M9%204%20L14%2014%20L4%2014%20Z'%20fill='black'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:center;background-size:contain;
+    transition:transform .18s ease;
+  }
+  #lbDots .dot.on{
+    background-image:url("data:image/svg+xml,%3Csvg%20width='18'%20height='16'%20viewBox='0%200%2018%2016'%3E%3Cpath%20d='M9%201%20L17%2015%20L1%2015%20Z'%20fill='black'/%3E%3Cpath%20d='M9%204%20L14%2014%20L4%2014%20Z'%20fill='white'/%3E%3C/svg%3E");
+    transform:scale(1.25);
+  }
+  /* gallery prev/next: triangle arrows, larger hit area, no square highlight */
   .lb-nav-btn{
-    background:none;border:none;color:#f4f4f0;cursor:pointer;z-index:5;
-    font-size:36px;line-height:1;
-    padding:28px 44px;            /* wide clickable zone around the arrow */
-    transition:font-size .18s ease, color .18s ease, background .18s ease;
+    background-color:transparent;border:none;cursor:pointer;z-index:5;
+    width:96px;height:80px;padding:0;
+    background-repeat:no-repeat;background-position:center;background-size:60px 60px;
+    transition:background-size .18s ease, filter .18s ease;
+  }
+  .lb-prev{
+    background-image:url("data:image/svg+xml,%3Csvg%20width='40'%20height='40'%20viewBox='0%200%2040%2040'%3E%3Cpath%20d='M38%202%20L38%2038%20L4%2020%20Z'%20fill='white'/%3E%3Cpath%20d='M32%208%20L32%2032%20L11%2020%20Z'%20fill='black'/%3E%3C/svg%3E");
+  }
+  .lb-next{
+    background-image:url("data:image/svg+xml,%3Csvg%20width='40'%20height='40'%20viewBox='0%200%2040%2040'%3E%3Cpath%20d='M2%202%20L2%2038%20L36%2020%20Z'%20fill='white'/%3E%3Cpath%20d='M8%208%20L8%2032%20L29%2020%20Z'%20fill='black'/%3E%3C/svg%3E");
   }
   .lb-nav-btn:hover{
-    font-size:52px;               /* grow when hovered */
-    color:#ffffff;
-    background:rgba(244,244,240,.06);
+    background-size:78px 78px;   /* grow on hover */
+    filter:drop-shadow(0 0 0 transparent);
+  }
+  .lb-prev:hover{
+    background-image:url("data:image/svg+xml,%3Csvg%20width='40'%20height='40'%20viewBox='0%200%2040%2040'%3E%3Cpath%20d='M38%202%20L38%2038%20L4%2020%20Z'%20fill='black'/%3E%3Cpath%20d='M32%208%20L32%2032%20L11%2020%20Z'%20fill='white'/%3E%3C/svg%3E");
+  }
+  .lb-next:hover{
+    background-image:url("data:image/svg+xml,%3Csvg%20width='40'%20height='40'%20viewBox='0%200%2040%2040'%3E%3Cpath%20d='M2%202%20L2%2038%20L36%2020%20Z'%20fill='black'/%3E%3Cpath%20d='M8%208%20L8%2032%20L29%2020%20Z'%20fill='white'/%3E%3C/svg%3E");
   }
 </style>
 
