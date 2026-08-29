@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Y12B Studio</title>
-<link rel="icon" href="favicon.ico?v=4" type="image/x-icon">
-<link rel="icon" href="favicon.png?v=4" type="image/png" sizes="256x256">
+<link rel="icon" href="favicon.ico?v=5" type="image/x-icon">
+<link rel="icon" href="favicon.png?v=5" type="image/png" sizes="256x256">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Instrument+Serif:ital@0;1&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
@@ -46,6 +46,25 @@
   .nav-side{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink);text-decoration:none;padding-top:4px;}
   .nav-side:last-child{text-align:right;justify-self:end;}
   .nav-side:hover{opacity:.55;}
+  /* dropdown menu */
+  .nav-menu{position:relative;}
+  .menu-btn{
+    font:inherit;font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--ink);background:none;border:none;cursor:pointer;padding:4px 0;
+  }
+  .menu-btn:hover{opacity:.55;}
+  .menu-drop{
+    position:absolute;top:calc(100% + 14px);left:0;min-width:240px;
+    background:var(--bg-soft);border:1px solid var(--line-strong);
+    display:none;flex-direction:column;z-index:200;
+  }
+  .menu-drop.open{display:flex;}
+  .menu-drop a{
+    color:var(--ink);text-decoration:none;font-size:13px;letter-spacing:.04em;
+    padding:11px 18px;border-bottom:1px solid var(--line);white-space:nowrap;
+  }
+  .menu-drop a:last-child{border-bottom:none;}
+  .menu-drop a:hover{background:var(--bg-dim);}
   .nav-logo{text-align:center;line-height:1;}
   .nav-logo a{
     color:var(--ink);text-decoration:none;font-weight:700;font-size:22px;
@@ -81,7 +100,7 @@
     background:rgba(240,240,236,0.18);
   }
   #crosshair .ch-plus{
-    position:absolute;width:10px;height:10px;transform:translate(-50%,-50%);
+    position:absolute;width:20px;height:20px;transform:translate(-50%,-50%);
     pointer-events:none;
   }
   #crosshair .ch-plus::before,
@@ -89,8 +108,8 @@
     content:'';position:absolute;background:rgba(240,240,236,0.6);
     transition:background .15s ease, box-shadow .15s ease;
   }
-  #crosshair .ch-plus::before{left:0;right:0;top:50%;height:1px;transform:translateY(-50%);}
-  #crosshair .ch-plus::after{top:0;bottom:0;left:50%;width:1px;transform:translateX(-50%);}
+  #crosshair .ch-plus::before{left:0;right:0;top:50%;height:1.5px;transform:translateY(-50%);}
+  #crosshair .ch-plus::after{top:0;bottom:0;left:50%;width:1.5px;transform:translateX(-50%);}
   body.crosshair-hover #crosshair .ch-plus::before,
   body.crosshair-hover #crosshair .ch-plus::after{
     background:rgba(240,240,236,0.95);
@@ -243,7 +262,17 @@
 
   <!-- NAV -->
   <nav>
-    <a class="nav-side" href="#work">Menu</a>
+    <div class="nav-side nav-menu">
+      <button class="menu-btn" id="menuBtn" aria-expanded="false">Menu</button>
+      <div class="menu-drop" id="menuDrop">
+        <a href="#work" data-goto="01-thi-thi">Thi Thi Garden House</a>
+        <a href="#work" data-goto="00-bat-trang">Bat Trang Pottery Showroom</a>
+        <a href="#work" data-goto="02-quoc-anh">Quoc Anh Beach Villa</a>
+        <a href="#work" data-goto="03-phu-tho">Phu Tho House</a>
+        <a href="#work" data-goto="04-hado">Hado Centrosa Apartment</a>
+        <a href="#work" data-goto="05-mimosa">Mimosa Coffee House</a>
+      </div>
+    </div>
     <div class="nav-logo">
       <a href="#">Y12B</a>
       <div class="nav-tagline">THINKING &amp; DOING ARCHITECTURE</div>
@@ -260,36 +289,36 @@
   <!-- PROJECT ROWS: 1 project per row, square grid -->
   <section class="rows" id="work">
 
-    <!-- 01 Bat Trang Pottery -->
-    <div class="prow" data-gallery="00-bat-trang" data-title="Bat Trang Pottery Showroom">
-      <div class="ph">
-        <img src="projects/00-bat-trang/cover.jpg" alt="Bat Trang Pottery Showroom">
-      </div>
-      <div class="info">
-        <div class="top">
-          <span class="num">01</span>
-          <span class="cat">Exhibition</span>
-        </div>
-        <div>
-          <div class="title">Bat Trang <span class="it">Pottery Showroom</span></div>
-          <div class="sub">2024 · Hà Nội</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 02 Thi Thi -->
+    <!-- 01 Thi Thi (swapped from 02) -->
     <div class="prow alt tint" data-gallery="01-thi-thi" data-title="Thi Thi Garden House">
       <div class="ph">
         <img src="projects/01-thi-thi/cover.jpg" alt="Thi Thi Garden House">
       </div>
       <div class="info">
         <div class="top">
-          <span class="num">02</span>
+          <span class="num">01</span>
           <span class="cat">Residential</span>
         </div>
         <div>
           <div class="title">Thi Thi <span class="it">Garden House</span></div>
           <div class="sub">2025 · Tây Ninh</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02 Bat Trang (swapped from 01) -->
+    <div class="prow" data-gallery="00-bat-trang" data-title="Bat Trang Pottery Showroom">
+      <div class="ph">
+        <img src="projects/00-bat-trang/cover.jpg" alt="Bat Trang Pottery Showroom">
+      </div>
+      <div class="info">
+        <div class="top">
+          <span class="num">02</span>
+          <span class="cat">Exhibition</span>
+        </div>
+        <div>
+          <div class="title">Bat Trang <span class="it">Pottery Showroom</span></div>
+          <div class="sub">2024 · Hà Nội</div>
         </div>
       </div>
     </div>
@@ -602,6 +631,31 @@ lb.addEventListener('touchend', e => {
   if (Math.abs(dx) > 50) (dx < 0) ? go((curIdx + 1) % curList.length, 1) : go((curIdx - 1 + curList.length) % curList.length, -1);
   touchX = null;
 }, {passive: true});
+
+/* ---- TOP MENU DROPDOWN ---- */
+const menuBtn = document.getElementById('menuBtn');
+const menuDrop = document.getElementById('menuDrop');
+menuBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  const open = menuDrop.classList.toggle('open');
+  menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+menuDrop.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const slug = a.dataset.goto;
+    const target = document.querySelector('.prow[data-gallery="' + slug + '"]');
+    menuDrop.classList.remove('open');
+    menuBtn.setAttribute('aria-expanded', 'false');
+    if (target) target.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+});
+document.addEventListener('click', e => {
+  if (!menuDrop.contains(e.target) && e.target !== menuBtn) {
+    menuDrop.classList.remove('open');
+    menuBtn.setAttribute('aria-expanded', 'false');
+  }
+});
 </script>
 
 </body>
