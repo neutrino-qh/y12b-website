@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Y12B Studio — Computational Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --parchment:#f3f1ed;
+    --white:#ffffff;
+    --ink:#181011;
+    --charcoal:#222222;
+    --aubergine:#302023;
+    --ash:#aaaaaa;
+    --dim:#666666;
+    --bone:#d8d4d4;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Inter',Helvetica,Arial,sans-serif;
+    background:var(--parchment);
+    color:var(--ink);
+    font-size:15px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1200px;margin:0 auto;padding:0 24px;}
+
+  /* ---------- NAV ---------- */
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px;}
+  .logo{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:400;color:var(--ink);text-decoration:none;}
+  .nav-links{display:flex;gap:12px;}
+  .nav-links a{font-size:14px;font-weight:400;color:var(--ink);text-decoration:none;padding:6px 10px;}
+  .nav-links a:hover{opacity:.6;}
+
+  /* ---------- BUTTONS ---------- */
+  .pill{
+    display:inline-block;background:var(--ink);color:var(--parchment);
+    padding:10px 24px;font-size:15px;font-weight:400;
+    text-decoration:none;transition:opacity .2s;
+  }
+  .pill:hover{opacity:.75;}
+
+  /* ---------- LABELS ---------- */
+  .label{
+    display:inline-block;background:var(--white);
+    padding:2px 8px;font-size:12px;font-weight:400;letter-spacing:.10em;
+    text-transform:uppercase;color:var(--ink);
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{display:grid;grid-template-columns:45% 55%;align-items:stretch;min-height:560px;}
+  .hero-text{padding:80px 48px 80px 0;display:flex;flex-direction:column;justify-content:center;gap:24px;}
+  .hero-intro{font-size:28px;line-height:1.3;color:var(--ash);font-weight:400;}
+  .hero-h1{font-size:48px;line-height:1.1;letter-spacing:-0.02em;font-weight:400;color:var(--ink);}
+  .hero-body{font-size:15px;line-height:1.5;color:var(--charcoal);max-width:420px;}
+  .hero-cta{margin-top:8px;}
+  .hero-visual{
+    position:relative;background:var(--aubergine);overflow:hidden;
+    display:flex;align-items:flex-end;justify-content:center;
+  }
+  .hero-slideshow{position:absolute;inset:0;}
+  .hero-slideshow img{
+    position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;opacity:0;transition:opacity 1.4s ease;
+  }
+  .hero-slideshow img.active{opacity:.92;}
+  .slide-dots{position:absolute;bottom:20px;right:24px;display:flex;gap:10px;z-index:6;}
+  .slide-dot{
+    width:8px;height:8px;background:rgba(255,255,255,.35);
+    transform:rotate(45deg);cursor:pointer;transition:background .3s;border:none;padding:0;
+  }
+  .slide-dot.active{background:#fff;}
+  .glass-card{
+    position:absolute;background:rgba(255,255,255,0.85);backdrop-filter:blur(8px);
+    padding:12px 16px;max-width:260px;
+  }
+  .glass-card .g-label{font-size:12px;letter-spacing:.10em;text-transform:uppercase;color:var(--dim);}
+  .glass-card .g-title{font-size:14px;font-weight:700;color:var(--ink);margin:4px 0 2px;}
+  .glass-card .g-body{font-size:12px;font-weight:400;color:var(--dim);line-height:1.4;}
+  .gc1{top:48px;right:32px;}
+  .gc2{bottom:48px;left:32px;}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:64px 0;}
+  .section-head{display:flex;flex-direction:column;gap:16px;margin-bottom:40px;}
+  .section-h2{font-size:40px;line-height:1.2;letter-spacing:-0.02em;font-weight:400;}
+
+  /* dark approach */
+  #approach{background:var(--aubergine);color:var(--white);padding:80px 0;}
+  #approach .section-h2{color:var(--white);}
+  .approach-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 64px;}
+  .approach-item{
+    display:grid;grid-template-columns:48px 1fr;gap:16px;
+    padding:24px 0;
+  }
+  .approach-item h3{font-size:20px;line-height:1.4;font-weight:700;color:var(--white);margin-bottom:4px;}
+  .approach-item p{font-size:15px;font-weight:400;color:var(--ash);line-height:1.5;}
+  .diamond{width:40px;height:40px;}
+
+  /* ---------- WORK ---------- */
+  .group-head{display:flex;align-items:baseline;gap:16px;margin:48px 0 24px;}
+  .group-head:first-of-type{margin-top:0;}
+  .group-title{font-size:20px;font-weight:700;}
+  .group-count{font-size:12px;letter-spacing:.10em;text-transform:uppercase;color:var(--dim);}
+  .work-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+  .work-card{
+    background:var(--white);
+    overflow:hidden;display:flex;flex-direction:column;transition:opacity .2s;
+  }
+  .work-card:hover{opacity:.85;cursor:pointer;}
+  .work-thumb{aspect-ratio:4/3;overflow:hidden;background:var(--bone);position:relative;}
+  .work-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s;}
+  .work-card:hover .work-thumb img{transform:scale(1.03);}
+  .gallery-badge{
+    position:absolute;bottom:12px;right:12px;background:rgba(255,255,255,0.9);
+    padding:2px 8px;font-size:12px;letter-spacing:.10em;
+    text-transform:uppercase;color:var(--ink);
+  }
+  /* lightbox */
+  .lightbox{
+    display:none;position:fixed;inset:0;z-index:100;background:rgba(24,16,17,0.94);
+    align-items:center;justify-content:center;flex-direction:column;
+  }
+  .lightbox.open{display:flex;}
+  .lightbox img{max-width:88vw;max-height:78vh;object-fit:contain;}
+  .lb-caption{color:var(--ash);font-size:12px;letter-spacing:.10em;text-transform:uppercase;margin-top:16px;}
+  .lb-btn{
+    position:absolute;top:50%;transform:translateY(-50%);background:none;border:none;
+    color:var(--white);font-size:32px;width:48px;height:48px;cursor:pointer;
+    font-family:inherit;
+  }
+  .lb-btn:hover{opacity:.7;}
+  .lb-prev{left:32px;}
+  .lb-next{right:32px;}
+  .lb-close{
+    position:absolute;top:24px;right:32px;background:none;border:none;color:var(--white);
+    font-size:28px;cursor:pointer;
+  }
+  .work-info{padding:20px 24px 24px;display:flex;flex-direction:column;gap:6px;}
+  .work-meta{font-size:12px;letter-spacing:.10em;text-transform:uppercase;color:var(--dim);}
+  .work-info h3{font-size:20px;line-height:1.3;font-weight:700;color:var(--ink);}
+  .work-info p{font-size:14px;color:var(--charcoal);line-height:1.5;}
+
+  /* ---------- SERVICES ---------- */
+  .services-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  .service-card{
+    background:var(--white);
+    padding:24px;display:grid;grid-template-columns:1fr 96px;gap:24px;align-items:start;
+  }
+  .service-card h3{font-size:20px;font-weight:700;margin-bottom:8px;}
+  .service-card p{font-size:15px;color:var(--charcoal);line-height:1.5;}
+  .service-card svg{width:96px;height:96px;}
+
+  /* ---------- CONTACT ---------- */
+  #contact{padding:96px 0 64px;background:var(--aubergine);color:var(--white);}
+  #contact .contact-h2{color:var(--white);}
+  #contact .pill{background:var(--white);color:var(--aubergine);}
+  #contact .pill:hover{opacity:.85;}
+  .contact-h2{font-size:48px;line-height:1.1;letter-spacing:-0.02em;font-weight:400;max-width:720px;margin-bottom:32px;}
+  .contact-info{display:flex;gap:80px;margin-top:56px;flex-wrap:wrap;}
+  .contact-block{display:flex;flex-direction:column;gap:12px;}
+  .contact-block p{font-size:15px;line-height:1.6;color:rgba(255,255,255,.75);}
+  .contact-block a{color:var(--white);text-decoration:none;border-bottom:none;}
+  .contact-block a:hover{opacity:.7;}
+  footer{padding:24px 0 40px;}
+  .foot{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--dim);letter-spacing:.10em;text-transform:uppercase;}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:900px){
+    .hero{grid-template-columns:1fr;}
+    .hero-text{padding:48px 0;}
+    .hero-visual{min-height:420px;}
+    .approach-grid{grid-template-columns:1fr;}
+    .work-grid{grid-template-columns:1fr;}
+    .services-grid{grid-template-columns:1fr;}
+    .nav-links{display:none;}
+    .contact-h2{font-size:32px;}
+    .glass-card{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="wrap nav-inner">
+    <a class="logo" href="#">
+      <svg width="12" height="12" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" fill="#181011" transform="rotate(45 6 6)"/></svg>
+      Y12B
+    </a>
+    <div class="nav-links">
+      <a href="#approach">Approach</a>
+      <a href="#work">Work</a>
+      <a href="#services">Services</a>
+    </div>
+    <a class="pill" href="#contact">Get in Touch</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="wrap">
+  <div class="hero">
+    <div class="hero-text">
+      <div class="hero-intro">Computational design studio — Ho Chi Minh City</div>
+      <h1 class="hero-h1">Architecture, computed with intent.</h1>
+      <p class="hero-body">Parametric workflows that turn repetitive modeling into design time — clean geometry, automated documentation, fabrication-ready output.</p>
+      <div class="hero-cta"><a class="pill" href="#contact">Get in Touch</a></div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-slideshow" id="heroSlideshow">
+        <img src="img/quocanh.jpg" alt="Nhà thầy Quốc Anh — garden house facade at dusk">
+        <img src="img/thithi.jpg" alt="Nhà chị Thi Thi — renovated tile-roof house">
+        <img src="img/hado.jpg" alt="Hado Centrosa — apartment interior">
+        <img src="img/namho.jpg" alt="Nam Ho — Dalat apartment with rattan">
+        <img src="img/mimosa.jpg" alt="Mimosa Coffee House — vaulted tile roof">
+        <img src="img/pottery.jpg" alt="Pottery Showroom — terracotta facade">
+      </div>
+      <div class="slide-dots" id="slideDots"></div>
+      <div class="glass-card gc1">
+        <div class="g-label">Residential</div>
+        <div class="g-title">Garden House, 2026</div>
+        <div class="g-body">Tile roof · stone walls · garden walkway</div>
+      </div>
+      <div class="glass-card gc2">
+        <div class="g-label">Workflow</div>
+        <div class="g-title">GH pipeline active</div>
+        <div class="g-body">142 iterations generated overnight</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- APPROACH (dark) -->
+<section id="approach">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="label">Approach</span>
+      <h2 class="section-h2">Repetitive modeling is a solved problem.</h2>
+    </div>
+    <div class="approach-grid">
+      <div class="approach-item">
+        <svg class="diamond" viewBox="0 0 40 40"><g fill="#aaaaaa"><rect x="2" y="2" width="8" height="8" transform="rotate(45 6 6)"/><rect x="16" y="2" width="8" height="8" transform="rotate(45 20 6)"/><rect x="30" y="2" width="8" height="8" transform="rotate(45 34 6)"/><rect x="2" y="16" width="8" height="8" transform="rotate(45 6 20)"/><rect x="16" y="16" width="8" height="8" transform="rotate(45 20 20)"/><rect x="30" y="16" width="8" height="8" transform="rotate(45 34 20)"/><rect x="2" y="30" width="8" height="8" transform="rotate(45 6 34)"/><rect x="16" y="30" width="8" height="8" transform="rotate(45 20 34)"/><rect x="30" y="30" width="8" height="8" transform="rotate(45 34 34)"/></g></svg>
+        <div>
+          <h3>Parametric by default</h3>
+          <p>Every geometry is defined by rules, parameters, and dependencies — not static surfaces. A facade change is a slider, not a week of redrawing.</p>
+        </div>
+      </div>
+      <div class="approach-item">
+        <svg class="diamond" viewBox="0 0 40 40"><g fill="#aaaaaa"><rect x="2" y="2" width="8" height="8" transform="rotate(45 6 6)"/><rect x="16" y="2" width="8" height="8" transform="rotate(45 20 6)"/><rect x="30" y="2" width="8" height="8" transform="rotate(45 34 6)"/><rect x="2" y="16" width="8" height="8" transform="rotate(45 6 20)"/><rect x="16" y="16" width="8" height="8" transform="rotate(45 20 20)"/><rect x="30" y="16" width="8" height="8" transform="rotate(45 34 20)"/><rect x="2" y="30" width="8" height="8" transform="rotate(45 6 34)"/><rect x="16" y="30" width="8" height="8" transform="rotate(45 20 34)"/><rect x="30" y="30" width="8" height="8" transform="rotate(45 34 34)"/></g></svg>
+        <div>
+          <h3>Automation first</h3>
+          <p>Scripted Grasshopper pipelines generate, test, and document hundreds of design iterations while the team focuses on judgment calls.</p>
+        </div>
+      </div>
+      <div class="approach-item">
+        <svg class="diamond" viewBox="0 0 40 40"><g fill="#aaaaaa"><rect x="2" y="2" width="8" height="8" transform="rotate(45 6 6)"/><rect x="16" y="2" width="8" height="8" transform="rotate(45 20 6)"/><rect x="30" y="2" width="8" height="8" transform="rotate(45 34 6)"/><rect x="2" y="16" width="8" height="8" transform="rotate(45 6 20)"/><rect x="16" y="16" width="8" height="8" transform="rotate(45 20 20)"/><rect x="30" y="16" width="8" height="8" transform="rotate(45 34 20)"/><rect x="2" y="30" width="8" height="8" transform="rotate(45 6 34)"/><rect x="16" y="30" width="8" height="8" transform="rotate(45 20 34)"/><rect x="30" y="30" width="8" height="8" transform="rotate(45 34 34)"/></g></svg>
+        <div>
+          <h3>Buildable precision</h3>
+          <p>Output is fabrication-ready: panelization, flat patterns, and CNC drawings come from the same model that produced the render.</p>
+        </div>
+      </div>
+      <div class="approach-item">
+        <svg class="diamond" viewBox="0 0 40 40"><g fill="#aaaaaa"><rect x="2" y="2" width="8" height="8" transform="rotate(45 6 6)"/><rect x="16" y="2" width="8" height="8" transform="rotate(45 20 6)"/><rect x="30" y="2" width="8" height="8" transform="rotate(45 34 6)"/><rect x="2" y="16" width="8" height="8" transform="rotate(45 6 20)"/><rect x="16" y="16" width="8" height="8" transform="rotate(45 20 20)"/><rect x="30" y="16" width="8" height="8" transform="rotate(45 34 20)"/><rect x="2" y="30" width="8" height="8" transform="rotate(45 6 34)"/><rect x="16" y="30" width="8" height="8" transform="rotate(45 20 34)"/><rect x="30" y="30" width="8" height="8" transform="rotate(45 34 34)"/></g></svg>
+        <div>
+          <h3>Taught, not black-boxed</h3>
+          <p>Every workflow we deliver is documented and teachable. We run Rhino/Grasshopper training so your team owns the pipeline.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORK -->
+<section id="work">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="label">Selected Work</span>
+      <h2 class="section-h2">Built with geometry that thinks.</h2>
+    </div>
+
+    <!-- NHÀ Ở -->
+    <div class="group-head">
+      <span class="group-title">Nhà ở — Residential</span>
+      <span class="group-count">2 projects</span>
+    </div>
+    <div class="work-grid">
+      <div class="work-card" data-gallery="01-nha-quoc-anh" data-title="Nhà thầy Quốc Anh">
+        <div class="work-thumb"><img src="img/quocanh.jpg" alt="Nhà thầy Quốc Anh — street facade with terracotta tile roofs"><span class="gallery-badge">+5 photos</span></div>
+        <div class="work-info">
+          <div class="work-meta">Garden House · 2026</div>
+          <h3>Nhà thầy Quốc Anh</h3>
+          <p>Single-storey garden house: overlapping terracotta-tile roofs over living spaces, a pergola draped in bougainvillea, and a lawn walkway binding the rooms to the garden.</p>
+        </div>
+      </div>
+      <div class="work-card" data-gallery="02-nha-chi-thi-thi" data-title="Nhà chị Thi Thi">
+        <div class="work-thumb"><img src="img/thithi.jpg" alt="Nhà chị Thi Thi — renovated garden house with terracotta roof"><span class="gallery-badge">+8 photos</span></div>
+        <div class="work-info">
+          <div class="work-meta">Renovation · 2025</div>
+          <h3>Nhà chị Thi Thi</h3>
+          <p>A 2025 renovation that keeps the tile-roof silhouette and dark plinth, opening the plan to a pebble-paved courtyard framed by palms and old trees.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHUNG CƯ - NỘI THẤT -->
+    <div class="group-head">
+      <span class="group-title">Chung cư — Apartment Interiors</span>
+      <span class="group-count">2 projects</span>
+    </div>
+    <div class="work-grid">
+      <div class="work-card">
+        <div class="work-thumb"><img src="img/hado.jpg" alt="Hado Centrosa apartment interior — oak and beige palette"></div>
+        <div class="work-info">
+          <div class="work-meta">Apartment · 2024</div>
+          <h3>Hado Centrosa</h3>
+          <p>Oak, beige lacquer and warm LED coves compose a calm apartment interior — altar niche, display shelving and dining in one continuous wall.</p>
+        </div>
+      </div>
+      <div class="work-card">
+        <div class="work-thumb"><img src="img/namho.jpg" alt="Nam Ho apartment Dalat — rattan and oak TV console"></div>
+        <div class="work-info">
+          <div class="work-meta">Apartment · Đà Lạt · 2023</div>
+          <h3>Nam Ho</h3>
+          <p>A Dalat apartment in rattan, oak and linen — soft textures against cool mountain light, designed around rest and slow mornings.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUÁN -->
+    <div class="group-head">
+      <span class="group-title">Quán — Hospitality</span>
+      <span class="group-count">1 project</span>
+    </div>
+    <div class="work-grid">
+      <div class="work-card">
+        <div class="work-thumb"><img src="img/mimosa.jpg" alt="Mimosa Coffee House — vaulted tile roof on Mimosa Pass"></div>
+        <div class="work-info">
+          <div class="work-meta">Café · Lâm Đồng · 2023–24</div>
+          <h3>Mimosa Coffee House</h3>
+          <p>On Mimosa Pass, seven kilometres from Da Lat: a vaulted tile roof and curved concrete walls frame the valley, drawing local materials and craftsmanship into the landscape.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- KHÔNG GIAN TRƯNG BÀY -->
+    <div class="group-head">
+      <span class="group-title">Trưng bày — Exhibition</span>
+      <span class="group-count">1 project</span>
+    </div>
+    <div class="work-grid">
+      <div class="work-card">
+        <div class="work-thumb"><img src="img/pottery.jpg" alt="Pottery showroom — terracotta brick facade with planter boats"></div>
+        <div class="work-info">
+          <div class="work-meta">Showroom · Ceramic</div>
+          <h3>Pottery Showroom</h3>
+          <p>A ceramics space rebuilt from an old kiln's memory — terracotta block screens, boat-like planters and timber racks displaying craft as living archive.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services" style="padding-top:0;">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="label">Services</span>
+      <h2 class="section-h2">What we take on.</h2>
+    </div>
+    <div class="services-grid">
+      <div class="service-card">
+        <div>
+          <h3>Architecture & Interiors</h3>
+          <p>Houses, apartments, cafés and exhibition spaces — from concept to construction documents, modeled clean in Rhino.</p>
+        </div>
+        <svg viewBox="0 0 96 96"><g stroke="#181011" stroke-width="1" fill="none"><rect x="20" y="20" width="56" height="56"/><line x1="20" y1="20" x2="48" y2="48"/><line x1="76" y1="20" x2="48" y2="48"/><line x1="20" y1="76" x2="48" y2="48"/><line x1="76" y1="76" x2="48" y2="48"/><circle cx="48" cy="48" r="3" fill="#181011"/></g></svg>
+      </div>
+      <div class="service-card">
+        <div>
+          <h3>Parametric Modeling</h3>
+          <p>Complex geometry kept logical and editable — a facade change is a slider, not a week of redrawing.</p>
+        </div>
+        <svg viewBox="0 0 96 96"><g stroke="#181011" stroke-width="1" fill="none"><path d="M18,70 L48,22 L78,70 Z"/><line x1="33" y1="46" x2="63" y2="46"/><line x1="26" y1="58" x2="70" y2="58"/><line x1="48" y1="22" x2="48" y2="70" stroke-dasharray="3 3"/></g></svg>
+      </div>
+      <div class="service-card">
+        <div>
+          <h3>Design Automation</h3>
+          <p>Custom Grasshopper pipelines that eliminate repetitive modeling, tagging and documentation tasks.</p>
+        </div>
+        <svg viewBox="0 0 96 96"><g stroke="#181011" stroke-width="1" fill="none"><rect x="14" y="38" width="24" height="20"/><rect x="58" y="38" width="24" height="20"/><path d="M38,48 h20"/><path d="M50,44 l8,4 -8,4" fill="none"/><circle cx="26" cy="48" r="2.5" fill="#181011"/><circle cx="70" cy="48" r="2.5" fill="#181011"/></g></svg>
+      </div>
+      <div class="service-card">
+        <div>
+          <h3>Team Enablement</h3>
+          <p>Rhino/Grasshopper training and workflow audits — computational capability, in-house.</p>
+        </div>
+        <svg viewBox="0 0 96 96"><g stroke="#181011" stroke-width="1" fill="none"><circle cx="34" cy="36" r="10"/><path d="M18,72 q16,-18 32,0"/><circle cx="64" cy="40" r="8"/><path d="M52,72 q12,-14 24,0"/></g></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="wrap">
+    <h2 class="contact-h2">Let's compute your next project.</h2>
+    <a class="pill" href="mailto:y12barchitects@gmail.com">y12barchitects@gmail.com</a>
+    <div class="contact-info">
+      <div class="contact-block">
+        <span class="label">Phone</span>
+        <p><a href="tel:+84935386601">(+84) 935 386 601</a><br><a href="tel:+84903772013">(+84) 903 772 013</a></p>
+      </div>
+      <div class="contact-block">
+        <span class="label">Studio</span>
+        <p>18 Pho Duc Chinh street<br>Gia Dinh ward, Ho Chi Minh City</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <span>Y12B Studio — Computational Architecture</span>
+    <span>18 Pho Duc Chinh, Gia Dinh, HCMC · y12barchitects@gmail.com</span>
+  </div>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" id="lbClose" aria-label="Close">×</button>
+  <button class="lb-btn lb-prev" id="lbPrev" aria-label="Previous">‹</button>
+  <img id="lbImg" src="" alt="">
+  <button class="lb-btn lb-next" id="lbNext" aria-label="Next">›</button>
+  <div class="lb-caption" id="lbCaption"></div>
+</div>
+
+<script>
+/* ---- HERO SLIDESHOW ---- */
+(function(){
+  const slides = document.querySelectorAll('#heroSlideshow img');
+  const dotsWrap = document.getElementById('slideDots');
+  const captions = [
+    ['Residential','Garden House, 2026','Tile roof · stone walls · garden walkway'],
+    ['Renovation','Nhà chị Thi Thi, 2025','Tile roof · courtyard · old trees'],
+    ['Apartment','Hado Centrosa, 2024','Oak · beige lacquer · warm coves'],
+    ['Apartment','Nam Ho, Đà Lạt 2023','Rattan · oak · mountain light'],
+    ['Café','Mimosa Coffee House','Vaulted tile roof on Mimosa Pass'],
+    ['Exhibition','Pottery Showroom','Terracotta screens · boat planters']
+  ];
+  const gc = document.querySelector('.hero-visual .glass-card.gc1');
+  let idx = 0, timer;
+  slides.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'slide-dot' + (i===0 ? ' active':'');
+    d.setAttribute('aria-label', 'Slide ' + (i+1));
+    d.onclick = () => { go(i); restart(); };
+    dotsWrap.appendChild(d);
+  });
+  const dots = dotsWrap.querySelectorAll('.slide-dot');
+  function go(i){
+    slides[idx].classList.remove('active'); dots[idx].classList.remove('active');
+    idx = i % slides.length;
+    slides[idx].classList.add('active'); dots[idx].classList.add('active');
+    if (gc){ gc.querySelector('.g-label').textContent = captions[idx][0];
+             gc.querySelector('.g-title').textContent = captions[idx][1];
+             gc.querySelector('.g-body').textContent  = captions[idx][2]; }
+  }
+  function restart(){ clearInterval(timer); timer = setInterval(() => go(idx+1), 4000); }
+  slides[0].classList.add('active');
+  restart();
+})();
+
+const GALLERIES = {"01-nha-quoc-anh": ["img/gallery/01-nha-quoc-anh/01.jpg","img/gallery/01-nha-quoc-anh/02.jpg","img/gallery/01-nha-quoc-anh/03.jpg","img/gallery/01-nha-quoc-anh/04.jpg"], "02-nha-chi-thi-thi": ["img/gallery/02-nha-chi-thi-thi/01.jpg","img/gallery/02-nha-chi-thi-thi/02.jpg","img/gallery/02-nha-chi-thi-thi/03.jpg","img/gallery/02-nha-chi-thi-thi/04.jpg","img/gallery/02-nha-chi-thi-thi/05.jpg","img/gallery/02-nha-chi-thi-thi/06.jpg","img/gallery/02-nha-chi-thi-thi/07.jpg"]};
+const lb = document.getElementById('lightbox');
+const lbImg = document.getElementById('lbImg');
+const lbCap = document.getElementById('lbCaption');
+let curList = [], curIdx = 0, curTitle = '';
+
+function show(i){
+  curIdx = (i + curList.length) % curList.length;
+  lbImg.src = curList[curIdx];
+  lbCap.textContent = curTitle + ' — ' + (curIdx+1) + ' / ' + curList.length;
+}
+document.querySelectorAll('.work-card[data-gallery]').forEach(card => {
+  card.addEventListener('click', () => {
+    const slug = card.dataset.gallery;
+    if (!GALLERIES[slug]) return;
+    curList = GALLERIES[slug];
+    curTitle = card.dataset.title || '';
+    // start with cover inside gallery list; open at first image
+    show(0);
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  });
+});
+document.getElementById('lbClose').onclick = () => { lb.classList.remove('open'); document.body.style.overflow = ''; };
+document.getElementById('lbPrev').onclick = e => { e.stopPropagation(); show(curIdx-1); };
+document.getElementById('lbNext').onclick = e => { e.stopPropagation(); show(curIdx+1); };
+lb.addEventListener('click', e => { if (e.target === lb) { lb.classList.remove('open'); document.body.style.overflow=''; }});
+document.addEventListener('keydown', e => {
+  if (!lb.classList.contains('open')) return;
+  if (e.key === 'Escape') { lb.classList.remove('open'); document.body.style.overflow=''; }
+  if (e.key === 'ArrowLeft') show(curIdx-1);
+  if (e.key === 'ArrowRight') show(curIdx+1);
+});
+</script>
+
+</body>
+</html>
