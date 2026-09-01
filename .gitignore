@@ -6,6 +6,9 @@ _old_*/
 # local only
 .DS_Store
 
+# hermes session notes (not part of site)
+.hermes/
+
 # not used by site (old slug text, 100M+)
 content/
 
