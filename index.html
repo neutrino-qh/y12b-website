@@ -697,9 +697,8 @@ else {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(BG);
 
-  // Perspective camera, 55mm full-frame equivalent (FOV ≈ 36°)
-  const FOV = 36;
-  const camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 1e9);
+  // Orthographic camera (axonometric — no vanishing point)
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1000, 1000);
   camera.position.set(1, 0.7, 1.4);
 
   const controls = new OrbitControls(camera, canvas);
@@ -716,41 +715,26 @@ else {
   const solidMat = new THREE.MeshBasicMaterial({ color: BG });
 
   // The model maxDim (in world units) is set by load() into camera.userData.maxDim.
-  // For PERSPECTIVE: pick a camera distance so the model fits the smaller viewport
-  // dimension. (FOV is fixed; we move the camera farther/nearer to frame the model.)
+  // ORTHO: pick a frustum half-height so the model fits BOTH axes at any aspect.
   function applyFrustum() {
     const w = container.clientWidth;
     const h = container.clientHeight;
     if (w === 0 || h === 0) return;
     renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    if (camera.userData.maxDim !== undefined) reframe();
-  }
-  // Place the camera at a distance such that the model's maxDim fits the smaller
-  // viewport dimension with a small margin. The direction is fixed (iso-ish) so the
-  // model stays framed on every resize — we only change distance, not orientation.
-  function reframe() {
+    const a = w / h;
     const maxDim = camera.userData.maxDim;
-    if (!maxDim) return;
-    const fovRad = (FOV * Math.PI) / 180;
-    const aspect = camera.aspect;
-    // For perspective, the half-extent visible at distance d is d * tan(fov/2) on
-    // the smaller axis. We want that to be >= maxDim/2.
-    const halfMin = Math.tan(fovRad / 2) * Math.min(1, aspect);   // min axis is vertical when aspect>1
-    // For full perspective framing: fit the model's maxDim on the smaller screen dim.
-    // If aspect > 1 (landscape), smaller dim is vertical -> distance based on fov.
-    // If aspect < 1 (portrait), smaller dim is horizontal -> distance = (maxDim/2) / tan(fov/2)/aspect.
-    // Simpler: take the larger of the two.
-    const distForHeight = (maxDim * 0.5) / Math.tan(fovRad / 2);
-    const distForWidth  = (maxDim * 0.5) / (Math.tan(fovRad / 2) * aspect);
-    const dist = Math.max(distForHeight, distForWidth) * 1.15;     // 15% margin
-    const dir = new THREE.Vector3(1, 0.7, 1.4).normalize();
-    camera.position.copy(dir.multiplyScalar(dist));
-    camera.near = Math.max(0.001, dist / 1000);
-    camera.far  = dist * 100;
-    controls.target.set(0, 0, 0);
-    controls.update();
+    if (maxDim === undefined) {
+      camera.left = -a; camera.right = a; camera.top = 1; camera.bottom = -1;
+    } else {
+      // Vertical fit: hh = maxDim/2. Horizontal fit: hh = (maxDim/2) / aspect.
+      // Pick the larger so the model fits the smaller screen dimension.
+      const hh = Math.max(maxDim * 0.5, (maxDim * 0.5) / a);
+      camera.left   = -hh * a;
+      camera.right  =  hh * a;
+      camera.top    =  hh;
+      camera.bottom = -hh;
+    }
+    camera.updateProjectionMatrix();
   }
 
   const loader = new GLTFLoader();
