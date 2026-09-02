@@ -163,38 +163,32 @@
      so no half-cell sliver appears at the top. */
   .home-3d::before{
     content:'';
-    position:absolute;left:0;right:0;top:var(--nav-h);bottom:0;
+    position:absolute;left:128px;right:128px;top:84px;bottom:0;     /* 1 coarse cell margin on left/right */
     --nav-h: 84px;
-    /* Fade the grid out near all four edges so boundary lines never show.
-       192px on left/right, 96px on top/bottom. */
-    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 192px, #000 calc(100% - 192px), transparent 100%),
-                        linear-gradient(to bottom, transparent 0, #000 96px, #000 calc(100% - 96px), transparent 100%);
-            mask-image: linear-gradient(to right, transparent 0, #000 192px, #000 calc(100% - 192px), transparent 100%),
-                        linear-gradient(to bottom, transparent 0, #000 96px, #000 calc(100% - 96px), transparent 100%);
+    /* Single mask: 4 linear-gradient fades combined via source-in (Chrome
+       supports mask-composite: source-in since 2020). Order: right, left,
+       bottom, top. The mask shows the grid only in the central rectangle. */
+    -webkit-mask-image:
+      linear-gradient(to right, transparent 0, #000 96px, #000 calc(100% - 96px), transparent 100%),
+      linear-gradient(to bottom, transparent 0, #000 96px, #000 calc(100% - 96px), transparent 100%);
+            mask-image:
+      linear-gradient(to right, transparent 0, #000 96px, #000 calc(100% - 96px), transparent 100%),
+      linear-gradient(to bottom, transparent 0, #000 96px, #000 calc(100% - 96px), transparent 100%);
     -webkit-mask-composite: source-in;
             mask-composite: intersect;
     background-image:
       /* coarse grid every 128px — slightly stronger */
-      linear-gradient(to right,  rgba(255,255,255,0.13) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255,255,255,0.13) 1px, transparent 1px),
-      /* fine grid every 12.8px — almost invisible, ~5% alpha */
-      linear-gradient(to right,  rgba(255,255,255,0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+      linear-gradient(to right,  rgba(255,255,255,0.07) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.07) 1px, transparent 1px),
+      /* fine grid every 12.8px — almost invisible, ~3% alpha */
+      linear-gradient(to right,  rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
     background-size:
       128px 128px,
       128px 128px,
       12.8px 12.8px,
       12.8px 12.8px;
     background-position: 0 0, 0 0, 0 0, 0 0;
-    pointer-events:none;
-    z-index:0;
-  }
-  /* Solid bg strip at the bottom of .home-3d, sized by JS so any partial
-     small-grid cell is hidden — the coarse grid always ends on a 128px line. */
-  .home-3d::after{
-    content:'';
-    position:absolute;left:0;right:0;bottom:0;height:var(--bot-mask,0px);
-    background:var(--bg);
     pointer-events:none;
     z-index:0;
   }
@@ -218,8 +212,8 @@
      elements flex to fill whatever space the text leaves. */
   .home-tag{
     display:flex;align-items:center;justify-content:center;gap:24px;
-    font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);
-    padding:24px 48px 12px;white-space:nowrap;
+    font-size:11px;line-height:1;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);
+    padding:20px 48px 12px;white-space:nowrap;     /* 20px gap from grid above (user spec) */
   }
   .home-tag::before,
   .home-tag::after{
@@ -969,20 +963,7 @@ else {
     .catch(e => console.warn('GLB HEAD failed:', e.message));
 
   applyFrustum();
-  // Pad the bottom of the grid layer so the coarse grid (128px) always ends
-  // on a full cell — the partial 12.8px sliver at the bottom is masked out.
-  function fitGridBottom() {
-    const h = container.clientHeight;
-    if (h === 0) return;
-    const COARSE = 128;
-    const navOffset = 84;            // matches --nav-h above
-    const usable = h - navOffset;
-    if (usable <= 0) return;
-    const remainder = usable % COARSE;        // px of partial cell
-    container.style.setProperty('--bot-mask', remainder + 'px');
-  }
-  fitGridBottom();
-  window.addEventListener('resize', fitGridBottom);
+  window.addEventListener('resize', applyFrustum);
 
   function frame() {
     controls.update();
