@@ -156,6 +156,51 @@
     grid-template-rows:1fr auto auto;    /* 3d | tag (with lines) | button */
     overflow:hidden;
   }
+  /* ============ 3D VIEWER BACKGROUND — technical grid (2 layers) ============ */
+  /* Two superimposed grids: a subtle fine grid (12.8px) for "graph paper" feel,
+     and a stronger coarse grid (128px) on top. No intersection dots.
+     The grid layer is clipped to start AT the bottom of the navbar (--nav-h)
+     so no half-cell sliver appears at the top. */
+  .home-3d::before{
+    content:'';
+    position:absolute;left:0;right:0;top:var(--nav-h);bottom:0;
+    --nav-h: 84px;
+    /* Fade the grid out near all four edges so boundary lines never show.
+       192px on left/right, 96px on top/bottom. */
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 192px, #000 calc(100% - 192px), transparent 100%),
+                        linear-gradient(to bottom, transparent 0, #000 96px, #000 calc(100% - 96px), transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0, #000 192px, #000 calc(100% - 192px), transparent 100%),
+                        linear-gradient(to bottom, transparent 0, #000 96px, #000 calc(100% - 96px), transparent 100%);
+    -webkit-mask-composite: source-in;
+            mask-composite: intersect;
+    background-image:
+      /* coarse grid every 128px — slightly stronger */
+      linear-gradient(to right,  rgba(255,255,255,0.13) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.13) 1px, transparent 1px),
+      /* fine grid every 12.8px — almost invisible, ~5% alpha */
+      linear-gradient(to right,  rgba(255,255,255,0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size:
+      128px 128px,
+      128px 128px,
+      12.8px 12.8px,
+      12.8px 12.8px;
+    background-position: 0 0, 0 0, 0 0, 0 0;
+    pointer-events:none;
+    z-index:0;
+  }
+  /* Solid bg strip at the bottom of .home-3d, sized by JS so any partial
+     small-grid cell is hidden — the coarse grid always ends on a 128px line. */
+  .home-3d::after{
+    content:'';
+    position:absolute;left:0;right:0;bottom:0;height:var(--bot-mask,0px);
+    background:var(--bg);
+    pointer-events:none;
+    z-index:0;
+  }
+  .home-3d > canvas{position:relative;z-index:1;}
+  .home-3d > .home-3d-fallback{z-index:2;}
+
   .home-3d{
     position:relative;
     width:100%;
@@ -679,9 +724,14 @@ document.addEventListener('click', function(e){
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Line2 } from 'three/addons/lines/Line2.js';
+import { LineSegments2 } from 'three/addons/lines/LineSegments2.js';
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js';
 
 const BG = 0x141413;
 const EDGE = 0xffffff;
+const EDGE_PX = 1.4;            // target line width in CSS pixels (uniform across all edges)
 
 const container = document.getElementById('home3d');
 const fallback  = document.getElementById('home3dFallback');
@@ -690,12 +740,12 @@ else {
   const canvas = document.createElement('canvas');
   container.appendChild(canvas);
 
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setClearColor(BG, 1);
+  renderer.setClearColor(BG, 0);            // alpha=0 so the CSS grid shows through
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(BG);
+  // No scene.background — let the CSS grid behind the canvas show through gaps between edges.
 
   // Orthographic camera (axonometric — no vanishing point)
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1000, 1000);
@@ -705,13 +755,25 @@ else {
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
   controls.autoRotate = true;
-  controls.autoRotateSpeed = 2.4;  // doubled (1.2 → 2.4)
+  controls.autoRotateSpeed = 1.2;  // halved (2.4 → 1.2)
   controls.target.set(0, 0, 0);
   controls.enableZoom = true;
   controls.zoomSpeed = 0.9;
   controls.enablePan = false;
 
-  const edgeMat = new THREE.LineBasicMaterial({ color: EDGE, transparent: true, opacity: 0.95 });
+  // LineMaterial works with Line2 / LineSegments2 (Line2.js addon). Unlike
+  // LineBasicMaterial, its linewidth is in CSS pixels and is GPU-accurate on
+  // every platform — so all edges (whether from EdgesGeometry or a wireframe
+  // InstancedMesh) get a uniform thickness.
+  const edgeMat = new LineMaterial({
+    color: EDGE,
+    linewidth: EDGE_PX,         // CSS pixels
+    transparent: true,
+    opacity: 0.95,
+    worldUnits: false,          // pixel-space (good for technical / schematic look)
+    dashed: false,
+  });
+  edgeMat.resolution.set(window.innerWidth, window.innerHeight);
   const solidMat = new THREE.MeshBasicMaterial({ color: BG });
 
   // The model maxDim (in world units) is set by load() into camera.userData.maxDim.
@@ -721,6 +783,7 @@ else {
     const h = container.clientHeight;
     if (w === 0 || h === 0) return;
     renderer.setSize(w, h, false);
+    edgeMat.resolution.set(w, h);          // keep Line2 line width accurate on resize
     const a = w / h;
     const maxDim = camera.userData.maxDim;
     if (maxDim === undefined) {
@@ -776,33 +839,53 @@ else {
         }
       });
 
-      // Trim outliers from line primitive bboxes
-      let trimBox = worldBox;
-      if (lineBoxes.length > 50) {
-        const minXs = lineBoxes.map(b => b.min.x).sort((a,b)=>a-b);
-        const maxXs = lineBoxes.map(b => b.max.x).sort((a,b)=>a-b);
-        const minYs = lineBoxes.map(b => b.min.y).sort((a,b)=>a-b);
-        const maxYs = lineBoxes.map(b => b.max.y).sort((a,b)=>a-b);
-        const minZs = lineBoxes.map(b => b.min.z).sort((a,b)=>a-b);
-        const maxZs = lineBoxes.map(b => b.max.z).sort((a,b)=>a-b);
-        const p = (arr, q) => arr[Math.min(arr.length-1, Math.max(0, Math.floor(arr.length*q)))];
-        trimBox = new THREE.Box3(
-          new THREE.Vector3(p(minXs,0.02), p(minYs,0.02), p(minZs,0.02)),
-          new THREE.Vector3(p(maxXs,0.98), p(maxYs,0.98), p(maxZs,0.98)),
-        );
-        if (trimBox.min.x >= trimBox.max.x || trimBox.min.y >= trimBox.max.y || trimBox.min.z >= trimBox.max.z) {
-          trimBox = worldBox;
-        }
-      }
-      const size = new THREE.Vector3();
-      const center = new THREE.Vector3();
-      trimBox.getSize(size);
-      trimBox.getCenter(center);
-      console.log('home3d trim AABB:', trimBox.min, trimBox.max, 'mesh:', meshCount, 'line:', lineCount);
+      // ===== Compute pivot (centroid) of the WHOLE model =====
+      // Compute AABB center of the world bounding box, and ALSO the geometric
+      // centroid by averaging the AABB centers of every mesh/line/instance.
+      // The mesh-centroid is more robust than the world AABB center (which is
+      // pulled by outlier points far from the visual mass).
+      const worldCenter = new THREE.Vector3();
+      worldBox.getCenter(worldCenter);
+      console.log('home3d world AABB:', worldBox.min, worldBox.max, 'mesh:', meshCount, 'line:', lineCount);
 
-      // Center model at origin
-      root.position.sub(center);
+      // Geometric centroid: average of per-mesh world AABB centers.
+      // Each mesh contributes ONE point (its own world bbox center) so a long
+      // outlier line contributes only a single outlier, not a billion points.
+      const pivot = new THREE.Vector3();
+      let pivotCount = 0;
+      root.traverse((o) => {
+        if (o.isInstancedMesh) {
+          o.geometry.computeBoundingBox();
+          const localBox = o.geometry.boundingBox;
+          if (!localBox) return;
+          for (let i = 0; i < o.count; i++) {
+            o.getMatrixAt(i, tmpM4);
+            tmpM4.multiply(o.matrixWorld);
+            const cb = localBox.clone().applyMatrix4(tmpM4);
+            pivot.add(cb.getCenter(new THREE.Vector3()));
+            pivotCount++;
+          }
+        } else if (o.isMesh || o.isLine || o.isLineSegments || o.isLineLoop) {
+          if (!o.geometry) return;
+          o.geometry.computeBoundingBox();
+          if (!o.geometry.boundingBox) return;
+          const cb = o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld);
+          pivot.add(cb.getCenter(new THREE.Vector3()));
+          pivotCount++;
+        }
+      });
+      if (pivotCount > 0) pivot.multiplyScalar(1 / pivotCount);
+      else pivot.copy(worldCenter);
+      console.log('home3d pivot (mesh-avg centroid):', pivot, 'from', pivotCount, 'meshes');
+      console.log('home3d worldCenter (AABB center):', worldCenter);
+
+      // Center model at origin: shift root so that pivot sits at (0,0,0)
+      root.position.sub(pivot);
       root.updateMatrixWorld(true);
+
+      // Size from world AABB (unchanged by translation)
+      const size = new THREE.Vector3();
+      worldBox.getSize(size);
 
       // Frustum is perspective — applyFrustum() handles distance per aspect.
       const maxDim = Math.max(size.x, size.y, size.z) || 1;
@@ -813,28 +896,56 @@ else {
       root.traverse((o) => {
         if (!o.isMesh && !o.isInstancedMesh) return;
         if (o.isInstancedMesh) {
+          // Solid occluder so the back edges are hidden by the front faces.
           const occluder = new THREE.InstancedMesh(o.geometry, solidMat, o.count);
           occluder.instanceMatrix = o.instanceMatrix;
           o.parent.add(occluder);
-          const wireInst = new THREE.InstancedMesh(
-            o.geometry,
-            new THREE.MeshBasicMaterial({ color: EDGE, wireframe: true, transparent: true, opacity: 0.9 }),
-            o.count
-          );
-          wireInst.instanceMatrix = o.instanceMatrix;
-          o.parent.add(wireInst);
           o.visible = false;
           return;
         }
         if (o.isLine || o.isLineSegments || o.isLineLoop) {
-          o.material = edgeMat;
+          // Convert basic line geometry to Line2/LineSegments2 so the same
+          // LineMaterial renders the curves with uniform line width.
+          const posAttr = o.geometry.attributes.position;
+          const segGeom = new LineSegmentsGeometry();
+          if (o.isLineSegments || o.isLineLoop) {
+            // setPositions expects pairs of vertices (start, end, start, end, ...)
+            segGeom.setPositions(posAttr.array);
+          } else {
+            // o.isLine (LINE_STRIP): build segment pairs from consecutive verts
+            const arr = posAttr.array;
+            const segs = new Float32Array(Math.max(0, arr.length - 3) * 2);
+            for (let i = 0, j = 0; i < arr.length - 3; i += 3, j += 6) {
+              segs[j]   = arr[i];
+              segs[j+1] = arr[i+1];
+              segs[j+2] = arr[i+2];
+              segs[j+3] = arr[i+3];
+              segs[j+4] = arr[i+4];
+              segs[j+5] = arr[i+5];
+            }
+            segGeom.setPositions(segs);
+          }
+          const l2 = new LineSegments2(segGeom, edgeMat);
+          // Preserve local transform by reparenting through a wrapper.
+          const wrapper = new THREE.Group();
+          wrapper.position.copy(o.position);
+          wrapper.quaternion.copy(o.quaternion);
+          wrapper.scale.copy(o.scale);
+          wrapper.add(l2);
+          o.parent.add(wrapper);
+          o.visible = false;
           return;
         }
+        // Triangle mesh — replace with edge LineSegments2 + bg occluder
         const edges = new THREE.EdgesGeometry(o.geometry, 25);
-        const lines = new THREE.LineSegments(edges, edgeMat);
+        const epos = edges.attributes.position.array;
+        const segGeom = new LineSegmentsGeometry();
+        segGeom.setPositions(epos);
+        const lines = new LineSegments2(segGeom, edgeMat);
         const solid = new THREE.Mesh(o.geometry, solidMat);
         const grp = new THREE.Group();
-        grp.add(solid); grp.add(lines);
+        grp.add(solid);
+        grp.add(lines);
         o.parent.add(grp);
         o.visible = false;
       });
@@ -858,7 +969,20 @@ else {
     .catch(e => console.warn('GLB HEAD failed:', e.message));
 
   applyFrustum();
-  window.addEventListener('resize', applyFrustum);
+  // Pad the bottom of the grid layer so the coarse grid (128px) always ends
+  // on a full cell — the partial 12.8px sliver at the bottom is masked out.
+  function fitGridBottom() {
+    const h = container.clientHeight;
+    if (h === 0) return;
+    const COARSE = 128;
+    const navOffset = 84;            // matches --nav-h above
+    const usable = h - navOffset;
+    if (usable <= 0) return;
+    const remainder = usable % COARSE;        // px of partial cell
+    container.style.setProperty('--bot-mask', remainder + 'px');
+  }
+  fitGridBottom();
+  window.addEventListener('resize', fitGridBottom);
 
   function frame() {
     controls.update();

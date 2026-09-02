@@ -152,12 +152,12 @@
   /* ============ LAYER 2 GALLERY ============ */
 
   /* ============ PROJECT ROWS — 4 cells: 2 text + 2 image ============ */
-  .rows{border-top:1px solid var(--line-strong);}
+  .rows{border-top:1px solid var(--line-strong);padding-top:84px;}   /* clear fixed navbar */
   .prow{
     display:grid;grid-template-columns:repeat(4,1fr);
     height:25vw;                          /* square unit row: 4 × 25vw */
     border-bottom:1px solid var(--line);
-    position:relative;cursor:pointer;scroll-margin-top:90px;
+    position:relative;cursor:pointer;scroll-margin-top:84px;
   }
   .prow::after{display:none;}
   .prow::before{display:none;}
