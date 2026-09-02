@@ -15,3 +15,8 @@ content/
 # full version backup (not deployed)
 index.full.html
 node_modules/
+
+# local dev helpers
+serve.py
+3d-test.html
+scramble-demo.html

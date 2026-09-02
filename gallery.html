@@ -149,51 +149,7 @@
   }
   body.crosshair-on, body.crosshair-on *{cursor:none;}
 
-  /* ============ LAYER 1 HOMEPAGE — single viewport ============ */
-  .home{
-    height:100vh;height:100dvh;          /* use dvh where supported so mobile chrome UI doesn't overflow */
-    display:grid;
-    grid-template-rows:1fr auto auto;    /* 3d | tag (with lines) | button */
-    overflow:hidden;
-  }
-  .home-3d{
-    position:relative;
-    width:100%;
-    min-height:0;            /* allow canvas to flex inside the grid row */
-    overflow:hidden;          /* hide any model that doesn't fit by chance */
-  }
-  .home-3d canvas{display:block;width:100%;height:100%;}
-  .home-3d-fallback{
-    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    color:var(--muted);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
-    text-align:center;padding:0 24px;
-  }
-  /* "from hue, based in saigon" with two horizontal lines on either side.
-     nowrap so the text always stays on one line; the two pseudo-line
-     elements flex to fill whatever space the text leaves. */
-  .home-tag{
-    display:flex;align-items:center;justify-content:center;gap:24px;
-    font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);
-    padding:24px 48px 12px;white-space:nowrap;
-  }
-  .home-tag::before,
-  .home-tag::after{
-    content:'';flex:1 1 auto;height:1px;background:var(--line-strong);
-    min-width:24px;max-width:30vw;
-  }
-  /* The button row sits 50px above the bottom of the viewport. */
-  .home-foot{
-    display:flex;justify-content:center;align-items:center;
-    padding:0 0 50px;
-  }
-  .home-btn{
-    display:inline-block;
-    font-size:9px;letter-spacing:.22em;text-transform:uppercase;     /* 0.8× of 11px, .22em of .28em */
-    color:#000;background:#fff;
-    padding:11px 29px;border:1px solid #fff;text-decoration:none;cursor:pointer;   /* 0.8× of 14px 36px */
-    transition:background .25s ease, color .25s ease;
-  }
-  .home-btn:hover{background:transparent;color:var(--ink);}
+  /* ============ LAYER 2 GALLERY ============ */
 
   /* ============ PROJECT ROWS — 4 cells: 2 text + 2 image ============ */
   .rows{border-top:1px solid var(--line-strong);}
@@ -332,7 +288,7 @@
       <button class="menu-btn" id="menuBtn" aria-expanded="false">Menu</button>
     </div>
     <div class="nav-logo">
-      <a href="#">Y12B</a>
+      <a href="index.html">Y12B</a>
       <div class="nav-tagline">THINKING &amp; DOING ARCHITECTURE</div>
     </div>
     <a class="nav-side" href="#contact">Contacts</a>
@@ -362,14 +318,244 @@
         </div>
       </div>
 
-  <!-- LAYER 1 HOMEPAGE: 3D viewer + tag (with side lines) + Gallery button -->
-  <section class="home" id="home">
-    <div class="home-3d" id="home3d">
-      <div class="home-3d-fallback" id="home3dFallback">loading 3d…</div>
+  <!-- PROJECT ROWS: 1 project per row, square grid -->
+  <section class="rows" id="work">
+
+    <!-- 01 Thi Thi (first, image LEFT) -->
+    <div class="prow tint" id="01-thi-thi" data-gallery="01-thi-thi" data-title="Thi Thi Garden House">
+      <div class="ph">
+        <img src="projects/01-thi-thi/cover.jpg" alt="Thi Thi Garden House">
+      </div>
+      <div class="info">
+        <div class="top">
+          <span class="num">01</span>
+          <span class="cat">Residential</span>
+        </div>
+        <div>
+          <div class="title">Thi Thi <span class="it">Garden House</span></div>
+          <div class="sub">2025 · Tây Ninh</div>
+        </div>
+      </div>
     </div>
-    <div class="home-tag">from hue, based in saigon</div>
-    <div class="home-foot">
-      <a class="home-btn" href="gallery.html">Enter</a>
+
+    <!-- 02 Bat Trang (image RIGHT) -->
+    <div class="prow alt" id="00-bat-trang" data-gallery="00-bat-trang" data-title="Bat Trang Pottery Showroom">
+      <div class="ph">
+        <img src="projects/00-bat-trang/cover.jpg" alt="Bat Trang Pottery Showroom">
+      </div>
+      <div class="info">
+        <div class="top">
+          <span class="num">02</span>
+          <span class="cat">Exhibition - Store</span>
+        </div>
+        <div>
+          <div class="title">Bat Trang <span class="it">Pottery Showroom</span></div>
+          <div class="sub">2024 · Hà Nội</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03 Quoc Anh (image LEFT) -->
+    <div class="prow" id="02-quoc-anh" data-gallery="02-quoc-anh" data-title="Quoc Anh Beach Villa">
+      <div class="ph">
+        <img src="projects/02-quoc-anh/cover.jpg" alt="Quoc Anh Beach Villa">
+      </div>
+      <div class="info">
+        <div class="top">
+          <span class="num">03</span>
+          <span class="cat">Residential</span>
+        </div>
+        <div>
+          <div class="title">Quoc Anh <span class="it">Beach Villa</span></div>
+          <div class="sub">2026 · Huế</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 04 Phu Tho House (image RIGHT) -->
+    <div class="prow alt tint-alt" id="03-phu-tho" data-gallery="03-phu-tho" data-title="Phu Tho House">
+      <div class="ph">
+        <img src="projects/03-phu-tho/cover.jpg" alt="Phu Tho House">
+      </div>
+      <div class="info">
+        <div class="top">
+          <span class="num">04</span>
+          <span class="cat">Interior</span>
+        </div>
+        <div>
+          <div class="title">Phu Tho <span class="it">House</span></div>
+          <div class="sub">2023 · Phú Thọ</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 05 Hado (image LEFT) -->
+    <div class="prow" id="04-hado" data-gallery="04-hado" data-title="Hado Centrosa Apartment">
+      <div class="ph">
+        <img src="projects/04-hado/cover.jpg" alt="Hado Centrosa Apartment">
+      </div>
+      <div class="info">
+        <div class="top">
+          <span class="num">05</span>
+          <span class="cat">Interior</span>
+        </div>
+        <div>
+          <div class="title">Hado Centrosa <span class="it">Apartment</span></div>
+          <div class="sub">2024 · Sài Gòn</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 06 Mimosa (image RIGHT) -->
+    <div class="prow alt" id="05-mimosa" data-gallery="05-mimosa" data-title="Mimosa Coffee House">
+      <div class="ph">
+        <img src="projects/05-mimosa/cover.jpg" alt="Mimosa Coffee House">
+      </div>
+      <div class="info">
+        <div class="top">
+          <span class="num">06</span>
+          <span class="cat">Commercial - F&amp;B</span>
+        </div>
+        <div>
+          <div class="title">Mimosa <span class="it">Coffee House</span></div>
+          <div class="sub">2024 · Đà Lạt</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 07 Cao Kim (image LEFT) -->
+    <div class="prow" id="06-caokim" data-gallery="06-caokim" data-title="Cao Kim Beauty Center">
+      <div class="ph">
+        <img src="projects/06-caokim/cover.jpg" alt="Cao Kim Beauty Center">
+      </div>
+      <div class="info">
+        <div class="top">
+          <span class="num">07</span>
+          <span class="cat">Commercial - F&amp;B</span>
+        </div>
+        <div>
+          <div class="title">Cao Kim <span class="it">Beauty Center</span></div>
+          <div class="sub">2023 · Sài Gòn</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 08 De la Soil (image RIGHT) -->
+    <div class="prow alt" id="07-delasoil" data-gallery="07-delasoil" data-title="De la Soil Pottery Shop">
+      <div class="ph">
+        <img src="projects/07-delasoil/cover.jpg" alt="De la Soil Pottery Shop">
+      </div>
+      <div class="info">
+        <div class="top">
+          <span class="num">08</span>
+          <span class="cat">Exhibition - Store</span>
+        </div>
+        <div>
+          <div class="title">De la Soil <span class="it">Pottery Shop</span></div>
+          <div class="sub">2024 · Sài Gòn</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- WORK INDEX (dark list) -->
+  <section class="index">
+    <div class="index-head">
+      <h2 class="index-title">Selected <span class="it">works</span></h2>
+    </div>
+    <div class="index-list">
+      <div class="index-row" data-gallery="01-thi-thi" data-title="Thi Thi Garden House">
+        <span class="no">01</span>
+        <span class="name">Thi Thi Garden House</span>
+        <span class="meta">2025 · Tây Ninh</span>
+      </div>
+      <div class="index-row" data-gallery="00-bat-trang" data-title="Bat Trang Pottery Showroom">
+        <span class="no">02</span>
+        <span class="name">Bat Trang Pottery Showroom</span>
+        <span class="meta">2024 · Hà Nội</span>
+      </div>
+      <div class="index-row" data-gallery="02-quoc-anh" data-title="Quoc Anh Beach Villa">
+        <span class="no">03</span>
+        <span class="name">Quoc Anh Beach Villa</span>
+        <span class="meta">2026 · Huế</span>
+      </div>
+      <div class="index-row" data-gallery="03-phu-tho" data-title="Phu Tho House">
+        <span class="no">04</span>
+        <span class="name">Phu Tho House</span>
+        <span class="meta">2023 · Phú Thọ</span>
+      </div>
+      <div class="index-row" data-gallery="04-hado" data-title="Hado Centrosa Apartment">
+        <span class="no">05</span>
+        <span class="name">Hado Centrosa Apartment</span>
+        <span class="meta">2024 · Sài Gòn</span>
+      </div>
+      <div class="index-row" data-gallery="05-mimosa" data-title="Mimosa Coffee House">
+        <span class="no">06</span>
+        <span class="name">Mimosa Coffee House</span>
+        <span class="meta">2024 · Đà Lạt</span>
+      </div>
+      <div class="index-row" data-gallery="06-caokim" data-title="Cao Kim Beauty Center">
+        <span class="no">07</span>
+        <span class="name">Cao Kim Beauty Center</span>
+        <span class="meta">2023 · Sài Gòn</span>
+      </div>
+      <div class="index-row" data-gallery="07-delasoil" data-title="De la Soil Pottery Shop">
+        <span class="no">08</span>
+        <span class="name">De la Soil Pottery Shop</span>
+        <span class="meta">2024 · Sài Gòn</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about">
+    <div>
+      <div class="about-label">Core Philosophy</div>
+    </div>
+    <div class="about-text">
+      We shape contemporary spaces while <span class="it">listening</span> to vernacular materials and traditions.
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact" id="contact">
+    <div class="contact-label">Contacts</div>
+    <h2 class="contact-h2">Let's shape<br>your <span class="it">space.</span></h2>
+    <div class="contact-rows">
+      <div class="contact-row">
+        <span class="k">Email</span>
+        <span><a href="mailto:y12barchitects@gmail.com">y12barchitects@gmail.com</a></span>
+      </div>
+      <div class="contact-row">
+        <span class="k">Phone</span>
+        <span><a href="tel:+84935386601">(+84) 935 386 601</a> &nbsp;·&nbsp; <a href="tel:+84903772013">(+84) 903 772 013</a></span>
+      </div>
+      <div class="contact-row">
+        <span class="k">Studio</span>
+        <span>18 Pho Duc Chinh street, Gia Dinh ward, Ho Chi Minh City</span>
+      </div>
+      <div class="contact-row">
+        <span class="k">Social</span>
+        <span class="contact-social">
+          <a href="https://www.linkedin.com/in/huynguyenarchitect" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.95v5.66H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+          </a>
+          <a href="https://www.facebook.com/huynguyenarch" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07c0 6.02 4.39 11.01 10.13 11.93v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.88v2.26h3.33l-.53 3.49h-2.8v8.44C19.61 23.08 24 18.09 24 12.07z"/></svg>
+          </a>
+          <a href="https://www.behance.net/huynguyenarquitecto" target="_blank" rel="noopener noreferrer" aria-label="Behance">
+            <img src="assets/social/behance.png" alt="Behance">
+          </a>
+          <a href="https://zalo.me/0935386601" target="_blank" rel="noopener noreferrer" aria-label="Zalo">
+            <img src="assets/social/zalo.png" alt="Zalo">
+          </a>
+        </span>
+      </div>
+    </div>
+    <div class="contact-foot">
+      <span>Y12B Studio — THINKING &amp; DOING ARCHITECTURE</span>
+      <span>© 2026 · Ho Chi Minh City</span>
     </div>
   </section>
 
@@ -610,279 +796,6 @@ document.addEventListener('click', function(e){
 
 /* ---- LAYER TOGGLE: removed; "Gallery" is now a plain link to gallery.html ---- */
 
-/* ---- HERO TEXT SCRAMBLE (cursor-proximity, slow) ---- */
-(function(){
-  const title = document.getElementById('heroTitle');
-  if (!title) return;
-  const CHARS = '!<>-_\\/[]{}—=+*^?#¥%&@§∆◊';
-  const RADIUS = 150, LIFT = 0.5;
-  const SWAP_MS = 130, SCR_MIN = 900, SCR_MAX = 1800, COOLDOWN = 1200;
-  const chars = [];
-  title.querySelectorAll('.word').forEach(word=>{
-    const text = word.dataset.text;
-    word.textContent = '';
-    for (const c of text){
-      const sp = document.createElement('span');
-      sp.className = 'ch';
-      sp.textContent = c;
-      word.appendChild(sp);
-      chars.push({ el: sp, final: c, x:0, y:0, lift:0, scrambling:false, until:0, lastSwap:0, cooldownUntil:0 });
-    }
-  });
-  function measure(){
-    chars.forEach(ch=>{ const r = ch.el.getBoundingClientRect(); ch.x = r.left + r.width/2; ch.y = r.top + r.height/2; });
-  }
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
-  window.addEventListener('load', measure);
-  window.addEventListener('resize', measure);
-  setTimeout(measure, 300);
-  let mx = -9999, my = -9999, inside = false;
-  title.addEventListener('mousemove', e=>{ mx=e.clientX; my=e.clientY; inside=true; });
-  title.addEventListener('mouseleave', ()=>{ inside=false; mx=my=-9999; });
-  const lerp = (a,b,t)=> a + (b-a)*t;
-  function frame(now){
-    chars.forEach(ch=>{
-      const d = Math.hypot(mx - ch.x, my - ch.y);
-      let strength = inside ? Math.max(0, 1 - d/RADIUS) : 0;
-      strength = Math.pow(strength, 1.25);
-      const targetLift = -strength * LIFT;
-      ch.lift = lerp(ch.lift, targetLift, 0.06);
-      ch.el.style.transform = 'translateY('+ch.lift.toFixed(3)+'em)';
-      if (inside && strength > 0.35 && !ch.scrambling && now > ch.cooldownUntil){
-        ch.scrambling = true;
-        ch.until = now + SCR_MIN + Math.random()*(SCR_MAX-SCR_MIN);
-        ch.lastSwap = 0;
-      }
-      if (ch.scrambling){
-        if (now - ch.lastSwap > SWAP_MS){ ch.el.textContent = CHARS[(Math.random()*CHARS.length)|0]; ch.lastSwap = now; }
-        if (now > ch.until){ ch.scrambling=false; ch.el.textContent=ch.final; ch.cooldownUntil=now+COOLDOWN; }
-      } else if (strength <= 0.35){
-        ch.el.textContent = ch.final;
-      }
-    });
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-})();
-</script>
-
-<!-- ============ 3D VIEWER (home page) ============ -->
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-  }
-}
-</script>
-<script type="module">
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-const BG = 0x141413;
-const EDGE = 0xffffff;
-
-const container = document.getElementById('home3d');
-const fallback  = document.getElementById('home3dFallback');
-if (!container) { console.warn('home3d container missing'); }
-else {
-  const canvas = document.createElement('canvas');
-  container.appendChild(canvas);
-
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setClearColor(BG, 1);
-
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(BG);
-
-  // Perspective camera, 55mm full-frame equivalent (FOV ≈ 36°)
-  const FOV = 36;
-  const camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 1e9);
-  camera.position.set(1, 0.7, 1.4);
-
-  const controls = new OrbitControls(camera, canvas);
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.08;
-  controls.autoRotate = true;
-  controls.autoRotateSpeed = 2.4;  // doubled (1.2 → 2.4)
-  controls.target.set(0, 0, 0);
-  controls.enableZoom = true;
-  controls.zoomSpeed = 0.9;
-  controls.enablePan = false;
-
-  const edgeMat = new THREE.LineBasicMaterial({ color: EDGE, transparent: true, opacity: 0.95 });
-  const solidMat = new THREE.MeshBasicMaterial({ color: BG });
-
-  // The model maxDim (in world units) is set by load() into camera.userData.maxDim.
-  // For PERSPECTIVE: pick a camera distance so the model fits the smaller viewport
-  // dimension. (FOV is fixed; we move the camera farther/nearer to frame the model.)
-  function applyFrustum() {
-    const w = container.clientWidth;
-    const h = container.clientHeight;
-    if (w === 0 || h === 0) return;
-    renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    if (camera.userData.maxDim !== undefined) reframe();
-  }
-  // Place the camera at a distance such that the model's maxDim fits the smaller
-  // viewport dimension with a small margin. The direction is fixed (iso-ish) so the
-  // model stays framed on every resize — we only change distance, not orientation.
-  function reframe() {
-    const maxDim = camera.userData.maxDim;
-    if (!maxDim) return;
-    const fovRad = (FOV * Math.PI) / 180;
-    const aspect = camera.aspect;
-    // For perspective, the half-extent visible at distance d is d * tan(fov/2) on
-    // the smaller axis. We want that to be >= maxDim/2.
-    const halfMin = Math.tan(fovRad / 2) * Math.min(1, aspect);   // min axis is vertical when aspect>1
-    // For full perspective framing: fit the model's maxDim on the smaller screen dim.
-    // If aspect > 1 (landscape), smaller dim is vertical -> distance based on fov.
-    // If aspect < 1 (portrait), smaller dim is horizontal -> distance = (maxDim/2) / tan(fov/2)/aspect.
-    // Simpler: take the larger of the two.
-    const distForHeight = (maxDim * 0.5) / Math.tan(fovRad / 2);
-    const distForWidth  = (maxDim * 0.5) / (Math.tan(fovRad / 2) * aspect);
-    const dist = Math.max(distForHeight, distForWidth) * 1.15;     // 15% margin
-    const dir = new THREE.Vector3(1, 0.7, 1.4).normalize();
-    camera.position.copy(dir.multiplyScalar(dist));
-    camera.near = Math.max(0.001, dist / 1000);
-    camera.far  = dist * 100;
-    controls.target.set(0, 0, 0);
-    controls.update();
-  }
-
-  const loader = new GLTFLoader();
-  loader.load(
-    'assets/3d/test.glb',
-    (gltf) => {
-      const root = gltf.scene;
-      scene.add(root);
-      root.updateMatrixWorld(true);
-
-      // World AABB (mesh + instanced + line)
-      const worldBox = new THREE.Box3();
-      const tmp = new THREE.Box3();
-      const m4 = new THREE.Matrix4();
-      let meshCount = 0, lineCount = 0;
-      const lineBoxes = [];
-      root.traverse((o) => {
-        if (o.isInstancedMesh) {
-          o.geometry.computeBoundingBox();
-          const ib = new THREE.Box3();
-          for (let i = 0; i < o.count; i++) {
-            o.getMatrixAt(i, m4);
-            tmp.copy(o.geometry.boundingBox).applyMatrix4(m4);
-            ib.union(tmp);
-          }
-          ib.applyMatrix4(o.matrixWorld);
-          worldBox.union(ib);
-          meshCount += o.count;
-        } else if (o.isMesh || o.isLine || o.isLineSegments || o.isLineLoop) {
-          if (o.geometry) {
-            o.geometry.computeBoundingBox();
-            tmp.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);
-            worldBox.union(tmp);
-            if (o.isLine || o.isLineSegments || o.isLineLoop) {
-              lineBoxes.push(tmp.clone());
-              lineCount++;
-            } else meshCount++;
-          }
-        }
-      });
-
-      // Trim outliers from line primitive bboxes
-      let trimBox = worldBox;
-      if (lineBoxes.length > 50) {
-        const minXs = lineBoxes.map(b => b.min.x).sort((a,b)=>a-b);
-        const maxXs = lineBoxes.map(b => b.max.x).sort((a,b)=>a-b);
-        const minYs = lineBoxes.map(b => b.min.y).sort((a,b)=>a-b);
-        const maxYs = lineBoxes.map(b => b.max.y).sort((a,b)=>a-b);
-        const minZs = lineBoxes.map(b => b.min.z).sort((a,b)=>a-b);
-        const maxZs = lineBoxes.map(b => b.max.z).sort((a,b)=>a-b);
-        const p = (arr, q) => arr[Math.min(arr.length-1, Math.max(0, Math.floor(arr.length*q)))];
-        trimBox = new THREE.Box3(
-          new THREE.Vector3(p(minXs,0.02), p(minYs,0.02), p(minZs,0.02)),
-          new THREE.Vector3(p(maxXs,0.98), p(maxYs,0.98), p(maxZs,0.98)),
-        );
-        if (trimBox.min.x >= trimBox.max.x || trimBox.min.y >= trimBox.max.y || trimBox.min.z >= trimBox.max.z) {
-          trimBox = worldBox;
-        }
-      }
-      const size = new THREE.Vector3();
-      const center = new THREE.Vector3();
-      trimBox.getSize(size);
-      trimBox.getCenter(center);
-      console.log('home3d trim AABB:', trimBox.min, trimBox.max, 'mesh:', meshCount, 'line:', lineCount);
-
-      // Center model at origin
-      root.position.sub(center);
-      root.updateMatrixWorld(true);
-
-      // Frustum is perspective — applyFrustum() handles distance per aspect.
-      const maxDim = Math.max(size.x, size.y, size.z) || 1;
-      camera.userData.maxDim = maxDim;
-      applyFrustum();
-
-      // Build edge lines + bg occluder per (instanced)mesh; restyle lines to white
-      root.traverse((o) => {
-        if (!o.isMesh && !o.isInstancedMesh) return;
-        if (o.isInstancedMesh) {
-          const occluder = new THREE.InstancedMesh(o.geometry, solidMat, o.count);
-          occluder.instanceMatrix = o.instanceMatrix;
-          o.parent.add(occluder);
-          const wireInst = new THREE.InstancedMesh(
-            o.geometry,
-            new THREE.MeshBasicMaterial({ color: EDGE, wireframe: true, transparent: true, opacity: 0.9 }),
-            o.count
-          );
-          wireInst.instanceMatrix = o.instanceMatrix;
-          o.parent.add(wireInst);
-          o.visible = false;
-          return;
-        }
-        if (o.isLine || o.isLineSegments || o.isLineLoop) {
-          o.material = edgeMat;
-          return;
-        }
-        const edges = new THREE.EdgesGeometry(o.geometry, 25);
-        const lines = new THREE.LineSegments(edges, edgeMat);
-        const solid = new THREE.Mesh(o.geometry, solidMat);
-        const grp = new THREE.Group();
-        grp.add(solid); grp.add(lines);
-        o.parent.add(grp);
-        o.visible = false;
-      });
-
-      if (fallback) fallback.style.display = 'none';
-    },
-    undefined,
-    (err) => {
-      console.error('GLB load error', err);
-      if (fallback) {
-        const url = 'assets/3d/test.glb';
-        const abs = new URL(url, location.href).href;
-        fallback.innerHTML = `3d unavailable<br><span style="opacity:.6;font-size:9px;letter-spacing:.1em;">${err.message || err} · ${abs}</span>`;
-        fallback.style.color = '#c44';
-      }
-    }
-  );
-  // HEAD probe so we can see HTTP status even when the loader swallows the error
-  fetch('assets/3d/test.glb', { method: 'HEAD' })
-    .then(r => console.log('GLB HEAD status:', r.status, r.headers.get('content-length')))
-    .catch(e => console.warn('GLB HEAD failed:', e.message));
-
-  applyFrustum();
-  window.addEventListener('resize', applyFrustum);
-
-  function frame() {
-    controls.update();
-    renderer.render(scene, camera);
-    requestAnimationFrame(frame);
-  }
-  frame();
-}
 </script>
 
 </body>
