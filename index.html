@@ -60,11 +60,29 @@
   .grid-bg::before{display:none;}
   .grid-bg > *{position:relative;z-index:1;}
 
-  /* ============ NAV ============ */
-  .grid-bg > nav{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:start;padding:28px 48px 16px;position:fixed;top:0;left:0;width:100%;z-index:300;background:var(--bg);border-bottom:1px solid var(--line);}
-  .nav-side{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink);text-decoration:none;padding-top:4px;}
-  .nav-side:last-child{text-align:right;justify-self:end;}
+  /* ============ NAV (shared between index.html and gallery.html) ============ */
+  /* Fixed 84px height. Flexbox with `align-items: baseline` so Menu, Y12B and
+     Contacts share the same text baseline despite their very different sizes.
+     Logo is dead-center; Menu and Contacts hug the left/right edges. */
+  .grid-bg > nav{
+    display:flex;align-items:baseline;justify-content:space-between;
+    position:fixed;top:0;left:0;width:100%;height:84px;
+    z-index:300;background:var(--bg);
+    border-bottom:1px solid var(--line);
+    padding:30px 48px;
+    box-sizing:border-box;
+  }
+  .nav-side{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink);text-decoration:none;}
+  .nav-side:last-child{text-align:right;}
   .nav-side:hover{opacity:.55;}
+  .nav-logo{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    text-align:center;line-height:1;
+  }
+  /* Shift the whole logo block down so the bottom edge of the Y12B glyph
+     (22px tall) sits flush with the bottom edge of Menu/Contacts (12px) at
+     their shared baseline. Pure optical alignment, ~5px nudge. */
+  .nav-logo{ transform:translate(-50%, calc(-50% + 5px)); }
   /* dropdown menu — full-width, borderless, grouped by category */
   .nav-menu{position:static;}
   .menu-btn{
@@ -156,6 +174,7 @@
     display:grid;
     grid-template-rows:1fr auto auto;    /* 3d | tag (with lines) | button */
     overflow:hidden;
+    justify-items:center;                /* center each grid item horizontally within its column */
   }
   /* ============ 3D VIEWER BACKGROUND — technical grid (2 layers) ============ */
   /* Two superimposed grids: a subtle fine grid (12.8px) for "graph paper" feel,
@@ -164,8 +183,8 @@
      so no half-cell sliver appears at the top. */
   .home-3d::before{
     content:'';
-    position:absolute;left:128px;right:128px;top:84px;bottom:0;     /* 1 coarse cell margin on left/right */
-    --nav-h: 84px;
+    position:absolute;left:128px;right:128px;top:84px;bottom:0;     /* 1 coarse-cell margin L/R, navbar offset top */
+    --nav-h:84px;
     /* Single mask: 4 linear-gradient fades combined via source-in (Chrome
        supports mask-composite: source-in since 2020). Order: right, left,
        bottom, top. The mask shows the grid only in the central rectangle. */
@@ -210,7 +229,10 @@
   }
   /* "from hue, based in saigon" with two horizontal lines on either side.
      nowrap so the text always stays on one line; the two pseudo-line
-     elements flex to fill whatever space the text leaves. */
+     elements flex to fill whatever space the text leaves.
+     Absolutely positioned so the whole row is dead-center horizontally. */
+  /* "from hue, based in saigon" with two horizontal lines on either side.
+     nowrap so the text always stays on one line. */
   .home-tag{
     display:flex;align-items:center;justify-content:center;gap:24px;
     font-size:11px;line-height:1;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);
@@ -221,7 +243,7 @@
     content:'';flex:1 1 auto;height:1px;background:var(--line-strong);
     min-width:24px;max-width:30vw;
   }
-  /* The button row sits 50px above the bottom of the viewport. */
+  /* Enter button row — 50px above the bottom of the viewport. */
   .home-foot{
     display:flex;justify-content:center;align-items:center;
     padding:0 0 50px;
@@ -241,7 +263,7 @@
     display:grid;grid-template-columns:repeat(4,1fr);
     height:25vw;                          /* square unit row: 4 × 25vw */
     border-bottom:1px solid var(--line);
-    position:relative;cursor:pointer;scroll-margin-top:90px;
+    position:relative;cursor:pointer;scroll-margin-top:94px;
   }
   .prow::after{display:none;}
   .prow::before{display:none;}
