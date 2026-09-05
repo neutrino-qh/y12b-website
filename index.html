@@ -380,47 +380,11 @@
     .menu-group:last-child{border-bottom:none;}
   }
   @media (max-width:560px){
-        .menu-drop{grid-template-columns:1fr;}
-      }
-
-      /* ============ OVERLAY SCROLLBAR (sits on top of content, takes no layout space, fully transparent track) ============ */
-      /* Hide native scrollbars on all platforms */
-      html{ scrollbar-width:none; -ms-overflow-style:none; }
-      body{ scrollbar-width:none; -ms-overflow-style:none; }
-      ::-webkit-scrollbar{ width:0 !important; height:0 !important; display:none !important; }
-
-      /* The overlay rail — fixed, transparent, 12px HIT AREA (6px visible thumb), never affects layout */
-          .scrollbar{
-            position:fixed; top:0; right:0; width:12px; height:100vh;
-            background:transparent; z-index:9999;
-            pointer-events:auto;
-            transition:opacity .25s ease;
-            opacity:0;
-            cursor:pointer;
-          }
-          .scrollbar.visible{ opacity:1; }
-          .scrollbar:hover, .scrollbar.dragging{ opacity:1; }
-          /* The thumb — 6px wide rectangular (no border-radius), 10% opacity by default, brighter on hover/active */
-              .scrollbar-thumb{
-                position:absolute; right:3px; width:6px;
-                min-height:60px;
-                background:rgba(240,240,236,.10);
-                border-radius:0;
-                transition:background-color .2s ease;
-                cursor:grab;
-                box-sizing:border-box;
-              }
-              .scrollbar:hover .scrollbar-thumb{ background:rgba(240,240,236,.5); }
-              .scrollbar.dragging .scrollbar-thumb,
-              .scrollbar.active .scrollbar-thumb{ background:rgba(240,240,236,.8); cursor:grabbing; }
-              .scrollbar.dragging{ cursor:grabbing; }
+    .menu-drop{grid-template-columns:1fr;}
+  }
+</style>
 </head>
 <body>
-
-<!-- OVERLAY SCROLLBAR (position:fixed; takes no layout space) -->
-<div class="scrollbar" id="ovScrollbar" aria-hidden="true">
-  <div class="scrollbar-thumb" id="ovScrollThumb"></div>
-</div>
 
 <div class="grid-bg">
 
@@ -539,105 +503,6 @@
 </style>
 
 <script>
-/* ---- OVERLAY SCROLLBAR (fixed; takes no layout space; transparent track) ---- */
-(function(){
-  const rail = document.getElementById('ovScrollbar');
-  const thumb = document.getElementById('ovScrollThumb');
-  if (!rail || !thumb) return;
-  let dragging = false, hideTimer = null;
-  // Remember where on the thumb the user grabbed (0..1) so the cursor
-  // stays glued to that point of the thumb as it moves (native scrollbar UX).
-  let grabOffset = 0;
-
-  function update(){
-    const doc = document.documentElement;
-    const scrollTop = window.scrollY || doc.scrollTop;
-    const max = (doc.scrollHeight - doc.clientHeight);
-    const visible = max > 4; // only show when page is actually scrollable
-    rail.classList.toggle('visible', visible);
-    if (max <= 0){ thumb.style.height = '0px'; thumb.style.top = '0px'; return; }
-    const railH = rail.clientHeight;
-    const thumbH = Math.max(60, Math.round(railH * (doc.clientHeight / doc.scrollHeight)));
-    const thumbY = Math.round((scrollTop / max) * (railH - thumbH));
-    thumb.style.height = thumbH + 'px';
-    thumb.style.top = thumbY + 'px';
-  }
-
-  function onScroll(){
-    rail.classList.add('active');
-    clearTimeout(hideTimer);
-    hideTimer = setTimeout(()=>{ rail.classList.remove('active'); if (!rail.matches(':hover') && !dragging) rail.classList.remove('visible'); }, 700);
-    update();
-  }
-
-  function scrollToRatio(ratio){
-    const max = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-    window.scrollTo(0, Math.round(Math.max(0, Math.min(1, ratio)) * max));
-  }
-
-  rail.addEventListener('mousedown', (e)=>{
-      if (e.button !== 0) return; // only left button drags the scrollbar
-      e.preventDefault();
-      dragging = true;
-      rail.classList.add('dragging');
-
-      const railRect = rail.getBoundingClientRect();
-      const thumbRect = thumb.getBoundingClientRect();
-      const clickY = e.clientY;
-
-      if (clickY >= thumbRect.top && clickY <= thumbRect.bottom){
-        // Grabbed ON the thumb: remember offset so cursor stays glued to same thumb point.
-        grabOffset = (clickY - thumbRect.top) / thumbRect.height;
-      } else {
-        // Clicked the rail above/below the thumb: center thumb on click, then continue
-        // dragging with cursor pinned to thumb center.
-        const railH = railRect.height;
-        const thumbH = thumbRect.height;
-        const newThumbTop = clickY - railRect.top - thumbH / 2;
-        const newRatio = newThumbTop / (railH - thumbH);
-        scrollToRatio(newRatio);
-        grabOffset = 0.5;
-      }
-      // CRITICAL: while dragging, disable CSS scroll-behavior:smooth. Otherwise every
-      // window.scrollTo() call starts a smooth animation that lags behind the cursor.
-      document.documentElement.style.scrollBehavior = 'auto';
-      update();
-    });
-
-    window.addEventListener('mousemove', (e)=>{
-      if (!dragging) return;
-      const railRect = rail.getBoundingClientRect();
-      const thumbRect = thumb.getBoundingClientRect();
-      const railH = railRect.height;
-      const thumbH = thumbRect.height;
-      const newThumbTop = e.clientY - railRect.top - thumbH * grabOffset;
-      const newRatio = newThumbTop / (railH - thumbH);
-      scrollToRatio(newRatio);
-    });
-
-    window.addEventListener('mouseup', ()=>{
-      if (!dragging) return;
-      dragging = false;
-      rail.classList.remove('dragging');
-      grabOffset = 0;
-      // Restore the page's CSS-defined smooth scroll behavior for anchor clicks
-      document.documentElement.style.scrollBehavior = '';
-    });
-
-  rail.addEventListener('mouseenter', ()=>{
-    rail.classList.add('visible');
-    clearTimeout(hideTimer);
-    if (!dragging) hideTimer = setTimeout(()=>{ if (!rail.matches(':hover')) rail.classList.remove('visible'); }, 1200);
-  });
-  rail.addEventListener('mouseleave', ()=>{ if (!dragging) rail.classList.remove('visible'); });
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', update);
-  update();
-  setTimeout(update, 200);
-  setTimeout(update, 1000);
-})();
-
 /* ---- CROSSHAIR ---- */
 (function(){
   const ch = document.getElementById('crosshair');
